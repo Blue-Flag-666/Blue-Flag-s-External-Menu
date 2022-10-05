@@ -1,20 +1,35 @@
 #pragma once
 
 #include "pch.hpp"
-
-#include <string>
-
-using std::wstring;
+#include "Settings.hpp"
 
 namespace BF
 {
-	class Memory
+	class Trainer
+	{
+		public:
+			clock_t keyTimer;
+
+			bool         CheckKeyState(int key);
+			virtual void CheckKeys();
+
+			Trainer& operator=(const Trainer&) = default;
+			Trainer& operator=(Trainer&&)      = default;
+
+			Trainer();
+			Trainer(const Trainer&) = default;
+			Trainer(Trainer&&)      = default;
+			virtual ~Trainer()      = default;
+	};
+
+	class Memory final : public Trainer
 	{
 		wstring  ProcessName;
 		HANDLE   ProcessHandle;
 		UINT     ProcessID;
 		UINT_PTR BaseAddr;
 		UINT     Size;
+
 		public:
 			[[nodiscard]] wstring name() const
 			{
@@ -41,12 +56,14 @@ namespace BF
 				return Size;
 			}
 
-			HWND hwnd() const
+			[[nodiscard]] HWND hwnd() const
 			{
-				
+				return static_cast <HWND>(ProcessHandle);
 			}
 
-			explicit Memory(const std::wstring& name);
+			void CheckKeys(Settings& settings);
+
 			Memory();
+			explicit Memory(const wstring& name);
 	};
 }

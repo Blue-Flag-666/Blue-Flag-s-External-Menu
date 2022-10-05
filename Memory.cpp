@@ -1,39 +1,5 @@
 #include "pch.hpp"
 
-constexpr UINT joaat(const std::string& str)
-{
-	constexpr UINT MASK = 0xffffffff;
-	UINT           hash = 0;
-	std::transform(str.begin(), str.end(), str.begin(), tolower);
-	for (const auto i : str)
-	{
-		hash = hash + static_cast <unsigned char>(i);
-		hash = hash + (hash << 10);
-		hash = hash ^ (hash & MASK) >> 6;
-	}
-	hash = hash + (hash << 3);
-	hash = hash ^ (hash & MASK) >> 11;
-	hash = hash + (hash << 15);
-	return hash & MASK;
-}
-
-constexpr UINT joaat(const std::wstring& str)
-{
-	constexpr UINT MASK = 0xffffffff;
-	UINT           hash = 0;
-	std::transform(str.begin(), str.end(), str.begin(), tolower);
-	for (const auto i : str)
-	{
-		hash = hash + static_cast <unsigned char>(i);
-		hash = hash + (hash << 10);
-		hash = hash ^ (hash & MASK) >> 6;
-	}
-	hash = hash + (hash << 3);
-	hash = hash ^ (hash & MASK) >> 11;
-	hash = hash + (hash << 15);
-	return hash & MASK;
-}
-
 BOOL ListSystemProcesses(WCHAR szExeFile[MAX_PATH], const LPPROCESSENTRY32 PE32)
 {
 	const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -90,31 +56,61 @@ BOOL ListProcessModules(const uint32_t dwProcessId, const WCHAR szModule[MAX_MOD
 	return FALSE;
 }
 
-BF::Memory::Memory(const wstring& name)
+bool BF::Trainer::CheckKeyState(const int key)
 {
-	ProcessName = name;
-
-	PROCESSENTRY32 PE32;
-	ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32);
-	if (!ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32))
+	if (clock() - keyTimer > 150 && GetAsyncKeyState(key) & 0x8000)
 	{
-		throw std::exception("Failed to find process id");
+		keyTimer = clock();
+		return true;
 	}
-	ProcessID     = PE32.th32ProcessID;
-	ProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessID);
-	if (!ProcessHandle)
-	{
-		throw std::exception("Failed to open handle");
-	}
+	return false;
+}
 
-	MODULEENTRY32 ME32;
-	if (ListProcessModules(ProcessID, name.c_str(), &ME32) == FALSE)
-	{
-		throw std::exception("Failed to get model info");
-	}
+void BF::Trainer::CheckKeys()
+{
+}
 
-	BaseAddr = reinterpret_cast <uintptr_t>(ME32.modBaseAddr);
-	Size     = ME32.modBaseSize;
+BF::Trainer::Trainer()
+{
+	keyTimer = clock();
+}
+
+void BF::Memory::CheckKeys(Settings& settings)
+{
+	if (CheckKeyState(settings.keys["ToggleMenu"]))
+	{
+		settings.ActiveMenu = !settings.ActiveMenu;
+	}
+	else if (CheckKeyState(settings.keys["MenuSelect"]))
+	{
+		MenuSelect();
+	}
+	else if (CheckKeyState(settings.keys["MenuUp"]))
+	{
+		MenuItemUp();
+	}
+	else if (CheckKeyState(settings.keys["MenuDown"]))
+	{
+		MenuItemDown();
+	}
+	else if (CheckKeyState(settings.keys["MenuLeft"]))
+	{
+		MenuTabLeft();
+	}
+	else if (CheckKeyState(settings.keys["MenuRight"]))
+	{
+		MenuTabRight();
+	}
+	else if (CheckKeyState(settings.keys["MenuBack"]))
+	{
+		MenuBack();
+	}
+	else
+	{
+		return;
+	}
+	// TODO:
+	RefreshMenu();
 }
 
 BF::Memory::Memory()
@@ -124,4 +120,31 @@ BF::Memory::Memory()
 	ProcessHandle = nullptr;
 	BaseAddr      = NULL;
 	Size          = NULL;
+}
+
+BF::Memory::Memory(const wstring& name)
+{
+	ProcessName = name;
+
+	PROCESSENTRY32 PE32;
+	ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32);
+	if (!ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32))
+	{
+		throw exception("Failed to find process id");
+	}
+	ProcessID     = PE32.th32ProcessID;
+	ProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, false, ProcessID);
+	if (!ProcessHandle)
+	{
+		throw exception("Failed to open handle");
+	}
+
+	MODULEENTRY32 ME32;
+	if (!ListProcessModules(ProcessID, name.c_str(), &ME32))
+	{
+		throw exception("Failed to get model info");
+	}
+
+	BaseAddr = reinterpret_cast <uintptr_t>(ME32.modBaseAddr);
+	Size     = ME32.modBaseSize;
 }

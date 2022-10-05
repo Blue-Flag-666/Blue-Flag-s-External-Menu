@@ -22,6 +22,15 @@
     <Filter Include="源文件\Function">
       <UniqueIdentifier>{c289d1c8-b857-4625-aecb-a1333b153310}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\TOML++">
+      <UniqueIdentifier>{a97f6568-6234-4949-b98e-db43c53cb871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Menu">
+      <UniqueIdentifier>{49ccb25a-2365-4888-833d-d6da17d61e6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Menu">
+      <UniqueIdentifier>{3dbc4b82-9311-402e-b534-a82631f6380c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory.hpp">
@@ -42,6 +51,18 @@
     <ClInclude Include="Settings.hpp">
       <Filter>头文件\Function</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer.hpp">
+      <Filter>头文件\Function</Filter>
+    </ClInclude>
+    <ClInclude Include="tomlplusplus\toml.hpp">
+      <Filter>头文件\TOML++</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.hpp">
+      <Filter>头文件\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Blue-Flag%27s External Menu.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Blue-Flag%27s External Menu.cpp">
@@ -50,11 +71,17 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Memory.cpp">
+    <ClCompile Include="Renderer.cpp">
       <Filter>源文件\Function</Filter>
     </ClCompile>
     <ClCompile Include="Settings.cpp">
-      <Filter>头文件\Function</Filter>
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>源文件\Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,5 +96,8 @@
     <Image Include="Blue-Flag%27s External Menu.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

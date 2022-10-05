@@ -6,33 +6,82 @@
 // 全局变量:
 HINSTANCE hInst;											// 当前实例
 wstring   OverlayTitle = L"Blue-Flag\'s External Menu";		// 标题
-HWND      OverlayHWND,   TargetHWND;
-int       OverlayHeight, OverlayWidth;
+HWND      OverlayHWND, TargetHWND;
 
-BF::Memory GTA5;
+BF::Memory       GTA5;
+BF::Settings     settings;
+BF::RendererD3D9 renderer;
 
-// 此代码模块中包含的函数的前向声明:
-ATOM             MyRegisterClass(HINSTANCE hInstance);
-BOOL             InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+vector <BF::MenuTab*> tabs;
+int                   cur_tab = 1;
 
-int APIENTRY wWinMain
-(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ LPWSTR lpCmdLine,_In_ const int nCmdShow)
+int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ const LPWSTR lpCmdLine,_In_ const int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	GTA5 = BF::Memory(L"GTA5.exe");
-	// TODO: 在此处放置代码。
+	settings = BF::Settings("Blue-Flag.toml");
+
+	int           cnt;
+	const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
+	for (int i = 0; i < cnt; i++)
+	{
+		OutputDebugString(szArgList[i]);
+		if (!wcscmp(szArgList[i], L"--console-debug"))
+		{
+			MessageBox(nullptr, L"Console Debug Mode Enabled", L"Blue-Flag\'s External Menu", MB_OK);
+			AllocCon();
+			settings.ConsoleDebug = true;
+		}
+		if (!wcscmp(szArgList[i], L"--console"))
+		{
+			AllocCon();
+		}
+		if (!wcscmp(szArgList[i], L"--no-ui"))
+		{
+			MessageBox(nullptr, L"UI Disabled", L"Blue-Flag\'s External Menu", MB_OK);
+			settings.NoUI = true;
+		}
+		if (!wcscmp(szArgList[i], L"--skip-memory-init"))
+		{
+			MessageBox(nullptr, L"Memory Init Skipped", L"Blue-Flag\'s External Menu", MB_OK);
+			settings.SkipMemInit = true;
+		}
+	}
+
+	if (!settings.SkipMemInit)
+	{
+		GTA5 = BF::Memory(L"GTA5.exe");
+	}
+
+	// TODO: 在此处放置代码
 
 	MyRegisterClass(hInstance);
+
+	TargetHWND = GTA5.hwnd();
+	if (!settings.SkipMemInit && !TargetHWND)
+	{
+		return FALSE;
+	}
+
+	InitMenu(tabs, settings);
 
 	// 执行应用程序初始化:
 	if (!InitInstance(hInstance, nCmdShow))
 	{
 		return FALSE;
 	}
+
+	if (!settings.NoUI)
+	{
+		renderer = BF::RendererD3D9(OverlayHWND, TargetHWND, settings.OverlayWidth, settings.OverlayHeight, settings);
+	}
+
+	MoveWindow(OverlayHWND, 0, 0, settings.OverlayWidth, settings.OverlayHeight, true);
+
+	CreateThread(nullptr, 0, KeysThread, nullptr, 0, nullptr);
+	Sleep(100);
+	CreateThread(nullptr, 0, FuncThread, nullptr, 0, nullptr);
 
 	MSG msg;
 
@@ -41,8 +90,6 @@ int APIENTRY wWinMain
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-
-		MoveWindow(OverlayHWND, 0, 0, OverlayWidth, OverlayHeight,TRUE);
 	}
 
 	return static_cast <int>(msg.wParam);
@@ -55,21 +102,7 @@ int APIENTRY wWinMain
 //
 ATOM MyRegisterClass(const HINSTANCE hInstance)
 {
-	WNDCLASSEXW wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style         = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc   = WndProc;
-	wcex.cbClsExtra    = 0;
-	wcex.cbWndExtra    = 0;
-	wcex.hInstance     = hInstance;
-	wcex.hIcon         = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BLUEFLAGSEXTERNALMENU));
-	wcex.hCursor       = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
-	wcex.lpszMenuName  = OverlayTitle.c_str();
-	wcex.lpszClassName = OverlayTitle.c_str();
-	wcex.hIconSm       = nullptr;
+	const WNDCLASSEXW wcex { sizeof(WNDCLASSEX),CS_HREDRAW | CS_VREDRAW, WndProc, 0, 0, hInstance,LoadIcon(hInstance,MAKEINTRESOURCE(IDI_BLUEFLAGSEXTERNALMENU)),LoadCursor(nullptr,IDC_ARROW), CreateSolidBrush(RGB(0, 0, 0)), OverlayTitle.c_str(), OverlayTitle.c_str(), nullptr };
 
 	return RegisterClassExW(&wcex);
 }
@@ -88,7 +121,7 @@ BOOL InitInstance(const HINSTANCE hInstance, const int nCmdShow)
 {
 	hInst = hInstance; // 将实例句柄存储在全局变量中
 
-	OverlayHWND = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED, OverlayTitle.c_str(), OverlayTitle.c_str(), WS_POPUP, 1, 1,CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	OverlayHWND = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW, OverlayTitle.c_str(), OverlayTitle.c_str(), WS_POPUP, 1, 1,CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
 	if (!OverlayHWND)
 	{
@@ -119,11 +152,28 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 		case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
-			HDC         hdc = BeginPaint(hWnd, &ps);
-			// TODO: 在此处添加使用 hdc 的任何绘图代码...
+			BeginPaint(hWnd, &ps);
+			if (!settings.NoUI)
+			{
+				renderer.render();
+			}
+			if (settings.ConsoleDebug)
+			{
+				system("cls");  // NOLINT(concurrency-mt-unsafe)
+
+				const auto menu  = tabs[cur_tab]->menu_stack.top();
+				const auto items = menu->getItems();
+
+				cout << menu->getName() << endl;
+				for (int i = 0; i < items.size(); i++)
+				{
+					const auto x = items[i];
+					cout << (i == menu->cur_item ? ">" : "") << "\t" << x->getName() << (x->getType() == BF::Menu_t || x->getType() == BF::Submenu_t ? ">>" : "") << endl;
+				}
+			}
 			EndPaint(hWnd, &ps);
+			break;
 		}
-		break;
 		case WM_DESTROY:
 		{
 			PostQuitMessage(0);
@@ -134,5 +184,89 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
 	}
+	return 0;
+}
+
+void MenuSelect()
+{
+	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	if (cur_menu->getItems().empty())
+	{
+		return;
+	}
+	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
+	{
+		case BF::Menu_t:
+		case BF::Submenu_t:
+		{
+			tabs[cur_tab]->menu_stack.push(static_cast <BF::Menu*>(cur_item));
+			break;
+		}
+		case BF::Action_t:
+		{
+			static_cast <BF::Action*>(cur_item)->Excute();
+		}
+		default: ;
+	}
+}
+
+void RefreshMenu()
+{
+	RedrawWindow(OverlayHWND, nullptr, nullptr, RDW_INTERNALPAINT);
+}
+
+void MenuItemUp()
+{
+	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	if (cur_menu->getItems().empty())
+	{
+		return;
+	}
+	cur_menu->cur_item = (cur_menu->cur_item - 1 + cur_menu->getItems().size()) % cur_menu->getItems().size();
+}
+
+void MenuItemDown()
+{
+	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	if (cur_menu->getItems().empty())
+	{
+		return;
+	}
+	cur_menu->cur_item = (cur_menu->cur_item + 1) % cur_menu->getItems().size();
+}
+
+void MenuTabLeft()
+{
+	cur_tab = (cur_tab - 1 + tabs.size()) % tabs.size();
+}
+
+void MenuTabRight()
+{
+	cur_tab = (cur_tab + 1) % tabs.size();
+}
+
+void MenuBack()
+{
+	if (tabs[cur_tab]->menu_stack.size() <= 1)
+	{
+		return;
+	}
+	tabs[cur_tab]->menu_stack.pop();
+}
+
+DWORD KeysThread(LPVOID lpParam)
+{
+	while (!settings.KillMenu)
+	{
+		GTA5.CheckKeys(settings);
+		Sleep(1);
+	}
+	settings.KeysThreadKilled = true;
+	return 0;
+}
+
+DWORD FuncThread(LPVOID lpParam)
+{
+	// TODO
 	return 0;
 }
