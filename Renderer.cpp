@@ -1,4 +1,5 @@
 ﻿#include "pch.hpp"
+#include "Renderer.hpp"
 
 void BF::RendererD3D9::init(const HWND hWnd)
 {
@@ -7,7 +8,7 @@ void BF::RendererD3D9::init(const HWND hWnd)
 		exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
 	}
 
-CreateDeviceRetry:ZeroMemory(&params, sizeof params);
+	ZeroMemory(&params, sizeof params);
 
 	params.BackBufferWidth  = OverlayWidth;
 	params.BackBufferHeight = OverlayHeight;
@@ -30,10 +31,8 @@ CreateDeviceRetry:ZeroMemory(&params, sizeof params);
 
 	if (FAILED(object->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &params, nullptr, &device)))
 	{
-		if (MessageBox(nullptr, L"Create D3D Device Failed", L"Blue-Flag\'s External Menu", MB_RETRYCANCEL) == IDRETRY)
-		{
-			goto CreateDeviceRetry;  // NOLINT(cppcoreguidelines-avoid-goto, hicpp-avoid-goto)
-		}
+		MessageBox(nullptr, L"Create D3D Device Failed", L"Blue-Flag\'s External Menu", MB_RETRYCANCEL);
+		KillMenu();
 	}
 	device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, true);
 	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, settings.FontName.c_str(), &font);

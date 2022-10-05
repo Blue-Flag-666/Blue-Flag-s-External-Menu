@@ -6,17 +6,6 @@
 
 #pragma once
 
-// 添加要在此处预编译的标头
-#include "framework.hpp"
-#include "Resource.h"
-
-#include "Blue-Flag's External Menu.hpp"
-#include "Memory.hpp"
-#include "Menu.hpp"
-#include "Renderer.hpp"
-#include "Settings.hpp"
-#include "toml.hpp"
-
 #include <algorithm>
 #include <ctime>
 #include <d3d12.h>
@@ -26,7 +15,9 @@
 #include <dxgi1_6.h>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <memory>
 #include <set>
 #include <shellapi.h>
 #include <stack>
@@ -37,19 +28,28 @@
 #include <windows.h>
 #include <wrl.h>
 
+#include "framework.hpp"
+#include "Resource.h"
+#include "toml.hpp"
+
 using namespace std::ranges;
 
 using std::cout;
 using std::endl;
 using std::exception;
 using std::function;
+using std::make_shared;
 using std::map;
 using std::set;
+using std::shared_ptr;
 using std::stack;
 using std::string;
 using std::vector;
 using std::wcout;
 using std::wstring;
+
+// 添加要在此处预编译的标头
+#include "Blue-Flag's External Menu.hpp"
 
 constexpr UINT joaat(const string& str)
 {

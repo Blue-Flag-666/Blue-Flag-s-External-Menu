@@ -2,6 +2,7 @@
 //
 
 #include "pch.hpp"
+#include "Blue-Flag's External Menu.hpp"
 
 // 全局变量:
 HINSTANCE hInst;											// 当前实例
@@ -12,8 +13,8 @@ BF::Memory       GTA5;
 BF::Settings     settings;
 BF::RendererD3D9 renderer;
 
-vector <BF::MenuTab*> tabs;
-int                   cur_tab = 1;
+vector <shared_ptr <BF::MenuTab> > tabs;
+int                                cur_tab = 0;
 
 int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ const LPWSTR lpCmdLine,_In_ const int nCmdShow)
 {
@@ -187,6 +188,10 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 	return 0;
 }
 
+void KillMenu()
+{
+}
+
 void MenuSelect()
 {
 	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
@@ -194,17 +199,17 @@ void MenuSelect()
 	{
 		return;
 	}
-	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
+	switch (auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
 		case BF::Menu_t:
 		case BF::Submenu_t:
 		{
-			tabs[cur_tab]->menu_stack.push(static_cast <BF::Menu*>(cur_item));
+			tabs[cur_tab]->menu_stack.push(std::static_pointer_cast <BF::Menu>(cur_item));
 			break;
 		}
 		case BF::Action_t:
 		{
-			static_cast <BF::Action*>(cur_item)->Excute();
+			std::static_pointer_cast <BF::Action>(cur_item)->Excute();
 		}
 		default: ;
 	}

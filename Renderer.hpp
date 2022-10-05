@@ -1,12 +1,7 @@
 ﻿#pragma once
 
 #include "pch.hpp"
-
-#include <d3d12.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-
-using std::string;
+#include "Settings.hpp"
 
 namespace BF
 {

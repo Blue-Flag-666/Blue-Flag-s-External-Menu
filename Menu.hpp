@@ -3,20 +3,13 @@
 #include "pch.hpp"
 #include "Settings.hpp"
 
-#include <functional>
-#include <stack>
-
-using std::function;
-using std::stack;
-using std::vector;
-
 namespace BF
 {
 	enum ItemType { MenuItem_t, Menu_t, Submenu_t, Action_t };
 
 	class MenuItem
 	{
-		string name;
+		string name {};
 		int    type {};
 		public:
 			[[nodiscard]] string getName() const
@@ -36,25 +29,25 @@ namespace BF
 			MenuItem(const MenuItem&) = default;
 			MenuItem(MenuItem&&)      = default;
 			explicit MenuItem(const string& str, int t = MenuItem_t);
-			virtual  ~MenuItem() = default;
+			~MenuItem() = default;
 	};
 
 	class Submenu;
 
 	class Menu : public MenuItem
 	{
-		vector <MenuItem*> items;
+		vector <shared_ptr <MenuItem> > items {};
 		public:
 			int cur_item {};
 
-			[[nodiscard]] vector <MenuItem*> getItems()
+			[[nodiscard]] vector <shared_ptr <MenuItem> > getItems()
 			{
 				return items;
 			}
 
-			[[nodiscard]] Submenu* add_submenu(const string& str, const function <void()>& fun = nullptr);
-			void                   add_action(const string& str, const function <void()>& fun);
-			void                   clear();
+			shared_ptr <Submenu> add_submenu(const string& str, const function <void()>& fun = nullptr);
+			void                 add_action(const string& str, const function <void()>& fun);
+			void                 clear();
 
 			Menu& operator=(const Menu&) = default;
 			Menu& operator=(Menu&&)      = default;
@@ -63,7 +56,7 @@ namespace BF
 			Menu(const Menu&) = default;
 			Menu(Menu&&)      = default;
 			explicit Menu(const string& str, int t = Menu_t);
-			virtual  ~Menu() override;
+			~Menu() = default;
 	};
 
 	class Submenu final : public Menu
@@ -85,17 +78,16 @@ namespace BF
 
 	struct MenuTab
 	{
-		Menu*         menu {};
-		stack <Menu*> menu_stack;
-		MenuTab&      operator=(const MenuTab&) = default;
-		MenuTab&      operator=(MenuTab&&)      = default;
+		shared_ptr <Menu>          menu {};
+		stack <shared_ptr <Menu> > menu_stack;
+		MenuTab&                   operator=(const MenuTab&) = default;
+		MenuTab&                   operator=(MenuTab&&)      = default;
 
 		MenuTab()               = default;
 		MenuTab(const MenuTab&) = default;
 		MenuTab(MenuTab&&)      = default;
-		explicit MenuTab(Menu* m);
-		~MenuTab();
+		explicit MenuTab(shared_ptr <Menu> m);
 	};
 
-	void InitMenu(vector <MenuTab*> &tabs, const Settings& settings);
+	void InitMenu(vector <shared_ptr <MenuTab> >& tabs, const Settings& settings);
 }

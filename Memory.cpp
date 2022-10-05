@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "Memory.hpp"
 
 BOOL ListSystemProcesses(WCHAR szExeFile[MAX_PATH], const LPPROCESSENTRY32 PE32)
 {

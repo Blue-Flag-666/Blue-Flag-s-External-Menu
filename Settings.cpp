@@ -1,4 +1,5 @@
 ﻿#include "pch.hpp"
+#include "Settings.hpp"
 
 inline void BF::Settings::initDefault()
 {
