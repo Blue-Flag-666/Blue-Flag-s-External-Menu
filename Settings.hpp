@@ -12,7 +12,7 @@ namespace BF
 
 		public:
 			int               OverlayWidth {}, OverlayHeight {};
-			bool              ActiveMenu {},   AlwaysShow {}, ConsoleDebug {}, KeysThreadKilled {}, KillMenu {}, NoUI {}, SkipMemInit {};
+			bool              ActiveMenu {},   AlwaysShow {}, ConsoleDebug {}, KeysThreadKilled {}, KillMenu {}, NoUI {}, SkipMemInit {}, UseOldD3D {};
 			wstring           FontName {};
 			map <string, int> keys {};
 

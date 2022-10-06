@@ -5,32 +5,65 @@
 
 namespace BF
 {
-	class RendererD3D12
+	class Renderer
 	{
-		HWND     TargetHWND {};
-		int      OverlayWidth {}, OverlayHeight {};
-		Settings settings;
+		HWND                  TargetHWND {};
+		shared_ptr <Settings> settings {};
 
-		ID3D12Device* device;
+		virtual void init(HWND hWnd) = 0;
+		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const = 0;
+
+		public:
+			[[nodiscard]] const HWND& targetHWND() const
+			{
+				return TargetHWND;
+			}
+
+			[[nodiscard]] const shared_ptr <Settings>& getSettings() const
+			{
+				return settings;
+			}
+
+			virtual void render() const = 0;
+
+			Renderer& operator=(const Renderer&) = default;
+			Renderer& operator=(Renderer&&)      = default;
+
+			Renderer()                = default;
+			Renderer(const Renderer&) = default;
+			Renderer(Renderer&&)      = default;
+			Renderer(HWND targetHWND, Settings& s);
+			virtual ~Renderer() = default;
 	};
 
-	class RendererD3D9
+	class RendererD3D12 final : public Renderer
 	{
-		HWND     TargetHWND {};
-		int      OverlayWidth {}, OverlayHeight {};
-		Settings settings;
+		ID3D12Device* device; // TODO
 
+		virtual void init(HWND hWnd) override;
+		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const override;
+
+		public:
+			virtual void render() const override;
+
+			RendererD3D12() = default;
+			RendererD3D12(HWND overlayHWND, HWND targetHWND, Settings& s);
+	};
+
+	class RendererD3D9 final : public Renderer
+	{
 		IDirect3D9Ex*         object {};
 		IDirect3DDevice9Ex*   device {};
 		D3DPRESENT_PARAMETERS params {};
 		ID3DXFont*            font {};
 
-		void init(HWND hWnd);
-		void drawText(const string& str, int x, int y, int a, int r, int g, int b) const;
+		virtual void init(HWND hWnd) override;
+		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const override;
 
 		public:
-			void render() const;
+			virtual void render() const override;
+
 			RendererD3D9() = default;
-			RendererD3D9(HWND overlayHWND, HWND targetHWND, int width, int height, const Settings& setting);
+			RendererD3D9(HWND overlayHWND, HWND targetHWND, Settings& s);
 	};
 }

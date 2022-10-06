@@ -1,6 +1,29 @@
 ﻿#include "pch.hpp"
 #include "Renderer.hpp"
 
+BF::Renderer::Renderer(const HWND targetHWND, Settings& s)
+{
+	TargetHWND = targetHWND;
+	settings   = shared_ptr <Settings>(&s);
+}
+
+void BF::RendererD3D12::init(HWND hWnd)
+{
+}
+
+void BF::RendererD3D12::drawText(const string& str, int x, int y, int a, int r, int g, int b) const
+{
+}
+
+void BF::RendererD3D12::render() const
+{
+}
+
+BF::RendererD3D12::RendererD3D12(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
+{
+	init(overlayHWND);
+}
+
 void BF::RendererD3D9::init(const HWND hWnd)
 {
 	if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &object)))
@@ -10,8 +33,10 @@ void BF::RendererD3D9::init(const HWND hWnd)
 
 	ZeroMemory(&params, sizeof params);
 
-	params.BackBufferWidth  = OverlayWidth;
-	params.BackBufferHeight = OverlayHeight;
+	const auto& settings = getSettings();
+
+	params.BackBufferWidth  = settings->OverlayWidth;
+	params.BackBufferHeight = settings->OverlayHeight;
 	params.BackBufferFormat = D3DFMT_A8R8G8B8;
 	if (SUCCEEDED(object->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL, D3DFMT_A8R8G8B8, true,D3DMULTISAMPLE_16_SAMPLES, NULL)))
 	{
@@ -35,7 +60,7 @@ void BF::RendererD3D9::init(const HWND hWnd)
 		KillMenu();
 	}
 	device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, true);
-	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, settings.FontName.c_str(), &font);
+	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, settings->FontName.c_str(), &font);
 }
 
 void BF::RendererD3D9::drawText(const string& str, const int x, const int y, const int a, const int r, const int g, const int b) const
@@ -56,20 +81,16 @@ void BF::RendererD3D9::render() const
 	device->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 	device->BeginScene();
 
-	if (settings.ActiveMenu && (settings.AlwaysShow || TargetHWND == GetForegroundWindow()))
+	if (const auto settings = getSettings(); settings->ActiveMenu && (settings->AlwaysShow || targetHWND() == GetForegroundWindow()))
 	{
-		drawText("Blue-Flag\'s External Menu", OverlayWidth / 10, OverlayHeight / 10, 255, 30, 144, 255);
+		drawText("Blue-Flag\'s External Menu", settings->OverlayWidth / 10, settings->OverlayHeight / 10, 255, 30, 144, 255);
 	}
 
 	device->EndScene();
 	device->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 }
 
-BF::RendererD3D9::RendererD3D9(const HWND overlayHWND, const HWND targetHWND, const int width, const int height, const Settings& setting)
+BF::RendererD3D9::RendererD3D9(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
-	OverlayWidth  = width;
-	OverlayHeight = height;
-	TargetHWND    = targetHWND;
-	settings      = setting;
 	init(overlayHWND);
 }

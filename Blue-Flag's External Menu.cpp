@@ -9,9 +9,10 @@ HINSTANCE hInst;											// 当前实例
 wstring   OverlayTitle = L"Blue-Flag\'s External Menu";		// 标题
 HWND      OverlayHWND, TargetHWND;
 
-BF::Memory       GTA5;
-BF::Settings     settings;
-BF::RendererD3D9 renderer;
+BF::Memory   GTA5;
+BF::Settings settings;
+
+shared_ptr <BF::Renderer> renderer;
 
 vector <shared_ptr <BF::MenuTab> > tabs;
 int                                cur_tab = 0;
@@ -75,7 +76,7 @@ int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevIns
 
 	if (!settings.NoUI)
 	{
-		renderer = BF::RendererD3D9(OverlayHWND, TargetHWND, settings.OverlayWidth, settings.OverlayHeight, settings);
+		settings.UseOldD3D ? renderer = std::make_shared <BF::RendererD3D9>(OverlayHWND, TargetHWND, settings) : renderer = std::make_shared <BF::RendererD3D12>(OverlayHWND, TargetHWND, settings);
 	}
 
 	MoveWindow(OverlayHWND, 0, 0, settings.OverlayWidth, settings.OverlayHeight, true);
@@ -156,20 +157,20 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 			BeginPaint(hWnd, &ps);
 			if (!settings.NoUI)
 			{
-				renderer.render();
+				renderer->render();
 			}
 			if (settings.ConsoleDebug)
 			{
 				system("cls");  // NOLINT(concurrency-mt-unsafe)
 
-				const auto menu  = tabs[cur_tab]->menu_stack.top();
-				const auto items = menu->getItems();
+				const auto& menu  = tabs[cur_tab]->menu_stack.top();
+				const auto& items = menu->getItems();
 
 				cout << menu->getName() << endl;
 				for (int i = 0; i < items.size(); i++)
 				{
-					const auto x = items[i];
-					cout << (i == menu->cur_item ? ">" : "") << "\t" << x->getName() << (x->getType() == BF::Menu_t || x->getType() == BF::Submenu_t ? ">>" : "") << endl;
+					const auto& x = items[i];
+					cout << (i == menu->cur_item ? "> " : "  ") << (x->getType() == BF::Toggle_t ? (static_pointer_cast <BF::Toggle>(x)->IsOn() ? "[*]" : "[ ]") : "") << "\t" << x->getName() << (x->getType() == BF::Menu_t || x->getType() == BF::Submenu_t ? ">>" : "") << endl;
 				}
 			}
 			EndPaint(hWnd, &ps);
@@ -194,22 +195,30 @@ void KillMenu()
 
 void MenuSelect()
 {
-	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;
 	}
-	switch (auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
+	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
+		case BF::Action_t:
+		{
+			static_pointer_cast <BF::Action>(cur_item)->Excute();
+			break;
+		}
+		case BF::Toggle_t:
+		{
+			const auto x = static_pointer_cast <BF::Toggle>(cur_item);
+			x->toggle();
+			x->Excute();
+			break;
+		}
 		case BF::Menu_t:
 		case BF::Submenu_t:
 		{
-			tabs[cur_tab]->menu_stack.push(std::static_pointer_cast <BF::Menu>(cur_item));
+			tabs[cur_tab]->menu_stack.push(static_pointer_cast <BF::Menu>(cur_item));
 			break;
-		}
-		case BF::Action_t:
-		{
-			std::static_pointer_cast <BF::Action>(cur_item)->Excute();
 		}
 		default: ;
 	}
@@ -222,7 +231,7 @@ void RefreshMenu()
 
 void MenuItemUp()
 {
-	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;
@@ -232,7 +241,7 @@ void MenuItemUp()
 
 void MenuItemDown()
 {
-	const auto cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;

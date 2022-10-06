@@ -43,6 +43,7 @@ using std::map;
 using std::set;
 using std::shared_ptr;
 using std::stack;
+using std::static_pointer_cast;
 using std::string;
 using std::vector;
 using std::wcout;

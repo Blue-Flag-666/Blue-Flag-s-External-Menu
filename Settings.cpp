@@ -13,6 +13,7 @@ inline void BF::Settings::initDefault()
 	KillMenu         = false;
 	NoUI             = false;
 	SkipMemInit      = false;
+	UseOldD3D        = true;
 
 	FontName = L"Arial";
 
