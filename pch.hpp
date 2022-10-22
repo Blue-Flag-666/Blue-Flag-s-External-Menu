@@ -1,12 +1,11 @@
-﻿// pch.hpp: 这是预编译标头文件。
-// 下方列出的文件仅编译一次，提高了将来生成的生成性能。
-// 这还将影响 IntelliSense 性能，包括代码完成和许多代码浏览功能。
-// 但是，如果此处列出的文件中的任何一个在生成之间有更新，它们全部都将被重新编译。
-// 请勿在此处添加要频繁更新的文件，这将使得性能优势无效。
+﻿// pch.hpp
 
 #pragma once
 
 #include <algorithm>
+#include <AtlBase.h>
+#include <atlconv.h>
+#include <conio.h>
 #include <ctime>
 #include <d3d12.h>
 #include <d3d9.h>
@@ -17,21 +16,25 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
 #include <shellapi.h>
+#include <spdlog.h>
 #include <stack>
 #include <stdexcept>
 #include <string>
 #include <TlHelp32.h>
+#include <toml.hpp>
 #include <vector>
 #include <windows.h>
 #include <wrl.h>
 
 #include "framework.hpp"
 #include "Resource.h"
-#include "toml.hpp"
 
+using namespace std::filesystem;
+using namespace std::literals;
 using namespace std::ranges;
 
 using std::cout;
@@ -40,6 +43,7 @@ using std::exception;
 using std::function;
 using std::make_shared;
 using std::map;
+using std::ofstream;
 using std::set;
 using std::shared_ptr;
 using std::stack;
@@ -49,8 +53,8 @@ using std::vector;
 using std::wcout;
 using std::wstring;
 
-// 添加要在此处预编译的标头
-#include "Blue-Flag's External Menu.hpp"
+constexpr auto MAX_MENU_ITEM = 1000;
+const wstring OverlayTitle = L"Blue-Flag\'s External Menu";		// 标题
 
 constexpr UINT joaat(const string& str)
 {
@@ -90,21 +94,19 @@ inline void AllocCon()
 {
 	AllocConsole();
 	FILE* stream;
-	freopen_s(&stream, "CON", "r", stdin);		// NOLINT(cert-err33-c)
+	freopen_s(&stream, "CON", "r", stdin);			// NOLINT(cert-err33-c)
 	freopen_s(&stream, "CON", "w", stdout);		// NOLINT(cert-err33-c)
 	freopen_s(&stream, "CON", "w", stderr);		// NOLINT(cert-err33-c)
 }
 
 inline string to_string(const wstring& ws)
 {
-	string s(ws.begin(), ws.end());
-	return s;
+	return string(CW2A(ws.c_str()));
 }
 
 inline wstring to_wstring(const string& s)
 {
-	wstring ws(s.begin(), s.end());
-	return ws;
+	return wstring(CA2W(s.c_str()));
 }
 
 constexpr int StrToVK(const string& str)

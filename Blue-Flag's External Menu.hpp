@@ -1,22 +1,21 @@
-// ReSharper disable CppUnusedIncludeDirective
-#pragma once
+ï»¿#pragma once
 
 #include "pch.hpp"
-#include "Memory.hpp"
-#include "Menu.hpp"
-#include "Renderer.hpp"
-#include "Settings.hpp"
 
-// ´Ë´úÂëÄ£¿éÖĞ°üº¬µÄº¯ÊıµÄÇ°ÏòÉùÃ÷:
+// æ­¤ä»£ç æ¨¡å—ä¸­åŒ…å«çš„å‡½æ•°çš„å‰å‘å£°æ˜:
 ATOM             MyRegisterClass(HINSTANCE hInstance);
 BOOL             InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+void ShowConsoleDebugMenu();
+void RefreshMenu();
+
 void KillMenu();
 void MenuSelect();
-void RefreshMenu();
 void MenuItemUp();
 void MenuItemDown();
+void MenuLeft();
+void MenuRight();
 void MenuTabLeft();
 void MenuTabRight();
 void MenuBack();

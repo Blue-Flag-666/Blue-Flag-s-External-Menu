@@ -5,7 +5,7 @@
 
 namespace BF
 {
-	enum ItemType { MenuItem_t, Menu_t, Submenu_t, Action_t, Toggle_t };
+	enum ItemType { MenuItem_t, Action_t, Toggle_t, Range_int_t, Range_float_t, Menu_t, Submenu_t };
 
 	class MenuItem
 	{
@@ -30,7 +30,10 @@ namespace BF
 	{
 		function <void()> func;
 		public:
-			void Excute() const;
+			void Excute() const
+			{
+				func();
+			}
 
 			Action() = default;
 			explicit Action(const string& str, const function <void()>& fun);
@@ -41,12 +44,60 @@ namespace BF
 		function <void(Toggle&)> func;
 		bool                     on { false };
 		public:
-			[[nodiscard]] const bool& IsOn() const;
-			bool                      toggle();
-			void                      Excute();
+			[[nodiscard]] const bool& IsOn() const
+			{
+				return on;
+			}
+
+			bool toggle()
+			{
+				on = !on;
+				return on;
+			}
+
+			void Excute()
+			{
+				func(*this);
+			}
 
 			Toggle() = default;
 			Toggle(const string& str, const function <void(Toggle&)>& fun);
+	};
+
+	template <typename T> class Range : public MenuItem
+	{
+		function <void(T&)> func;
+		T                   cur, min, max, delta;
+		public:
+			void left()
+			{
+				cur = cur - delta;
+				if (cur < min)
+				{
+					cur = min;
+				}
+			}
+
+			void right()
+			{
+				cur = cur + delta;
+				if (cur > max)
+				{
+					cur = max;
+				}
+			}
+
+			void Excute()
+			{
+				func(cur);
+			}
+
+			[[nodiscard]] T& value()
+			{
+				return cur;
+			}
+
+			Range(const string& str, T init, T mi, T ma, T d, function <void(T&)> fun);
 	};
 
 	class Submenu;
@@ -62,14 +113,28 @@ namespace BF
 				return items;
 			}
 
-			void clear();
+			void clear()
+			{
+				items.clear();
+			}
 
-			void                 add_action(const string& str, const function <void()>& fun);
-			void                 add_toggle(const string& str, const function <void(Toggle&)>& fun);
-			shared_ptr <Submenu> add_submenu(const string& str, const function <void()>& fun = nullptr);
+			void                    add_action(const string& str, const function <void()>& fun);
+			void                    add_toggle(const string& str, const function <void(Toggle&)>& fun);
+			template <typename T> void add_range(const string& str, T init, T mi, T ma, T d, function <void(T&)> fun);
+			shared_ptr <Submenu>    add_submenu(const string& str, const function <void()>& fun = nullptr);
 
-			Menu() = default;
+			Menu& operator=(const Menu&) = default;
+			Menu& operator=(Menu&&)      = default;
+
+			Menu()            = default;
+			Menu(const Menu&) = default;
+			Menu(Menu&&)      = default;
 			explicit Menu(const string& str, int t = Menu_t);
+
+			~Menu()
+			{
+				items.clear();
+			}
 	};
 
 	class Submenu final : public Menu
@@ -82,7 +147,6 @@ namespace BF
 
 	struct MenuTab
 	{
-		shared_ptr <Menu>          menu {};
 		stack <shared_ptr <Menu> > menu_stack {};
 
 		MenuTab() = default;

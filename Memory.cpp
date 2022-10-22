@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "Memory.hpp"
+#include "Blue-Flag's External Menu.hpp"
 
 BOOL ListSystemProcesses(WCHAR szExeFile[MAX_PATH], const LPPROCESSENTRY32 PE32)
 {
@@ -96,9 +97,17 @@ void BF::Memory::CheckKeys(Settings& settings)
 	}
 	else if (CheckKeyState(settings.keys["MenuLeft"]))
 	{
-		MenuTabLeft();
+		MenuLeft();
 	}
 	else if (CheckKeyState(settings.keys["MenuRight"]))
+	{
+		MenuRight();
+	}
+	else if (CheckKeyState(settings.keys["MenuTabLeft"]))
+	{
+		MenuTabLeft();
+	}
+	else if (CheckKeyState(settings.keys["MenuTabRight"]))
 	{
 		MenuTabRight();
 	}
@@ -110,7 +119,6 @@ void BF::Memory::CheckKeys(Settings& settings)
 	{
 		return;
 	}
-	// TODO:
 	RefreshMenu();
 }
 

@@ -22,9 +22,6 @@
     <Filter Include="源文件\Function">
       <UniqueIdentifier>{c289d1c8-b857-4625-aecb-a1333b153310}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\TOML++">
-      <UniqueIdentifier>{a97f6568-6234-4949-b98e-db43c53cb871}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\Menu">
       <UniqueIdentifier>{49ccb25a-2365-4888-833d-d6da17d61e6b}</UniqueIdentifier>
     </Filter>
@@ -53,9 +50,6 @@
     </ClInclude>
     <ClInclude Include="Renderer.hpp">
       <Filter>头文件\Function</Filter>
-    </ClInclude>
-    <ClInclude Include="tomlplusplus\toml.hpp">
-      <Filter>头文件\TOML++</Filter>
     </ClInclude>
     <ClInclude Include="Menu.hpp">
       <Filter>头文件\Menu</Filter>

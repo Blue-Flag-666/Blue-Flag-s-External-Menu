@@ -56,6 +56,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -68,7 +71,12 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <StringPooling>true</StringPooling>
-      <AdditionalIncludeDirectories>packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\include;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\include;packages\directxtk12_desktop_2019.2022.7.30.1\include;tomlplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\include;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\include;packages\directxtk12_desktop_2019.2022.7.30.1\include;tomlplusplus;D:\Downloads\My\GTA\DEV\Blue-Flag%27s-External-Menu\spdlog\include;D:\Downloads\My\GTA\DEV\Blue-Flag%27s-External-Menu\spdlog\include\spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>All</AssemblerOutput>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,7 +86,20 @@
       <MapExports>true</MapExports>
       <AdditionalDependencies>d3d9.lib;d3dx9d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>packages\directxtk12_desktop_2019.2022.7.30.1\native\lib\x64\Release;packages\directxtk12_desktop_2019.2022.7.30.1\native\lib\x64\Debug;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\bin\x64;packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\release\lib\x64;packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\debug\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
+    <Manifest>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Manifest>
+    <ResourceCompile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ResourceCompile>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -95,10 +116,12 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
-      <AdditionalIncludeDirectories>packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\include;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\include;packages\directxtk12_desktop_2019.2022.7.30.1\include;tomlplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\include;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\include;packages\directxtk12_desktop_2019.2022.7.30.1\include;tomlplusplus;D:\Downloads\My\GTA\DEV\Blue-Flag%27s-External-Menu\spdlog\include;D:\Downloads\My\GTA\DEV\Blue-Flag%27s-External-Menu\spdlog\include\spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <StructMemberAlignment>Default</StructMemberAlignment>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,7 +133,23 @@
       <AdditionalLibraryDirectories>packages\directxtk12_desktop_2019.2022.7.30.1\native\lib\x64\Release;packages\directxtk12_desktop_2019.2022.7.30.1\native\lib\x64\Debug;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\bin\x64;packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\release\lib\x64;packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\debug\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SectionAlignment>
       </SectionAlignment>
+      <AssemblyDebug>false</AssemblyDebug>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ResourceCompile>
+    <Manifest>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Manifest>
+    <Xdcmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Xdcmake>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Blue-Flag%27s External Menu.hpp" />
@@ -122,7 +161,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="tomlplusplus\toml.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Blue-Flag%27s External Menu.cpp" />

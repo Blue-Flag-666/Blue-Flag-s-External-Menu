@@ -11,7 +11,10 @@ namespace BF
 		shared_ptr <Settings> settings {};
 
 		virtual void init(HWND hWnd) = 0;
-		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const = 0;
+		virtual void drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const = 0;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const = 0;
+		virtual void drawText(const wstring& str, int x, int y, D3DCOLOR color) const = 0;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const = 0;
 
 		public:
 			[[nodiscard]] const HWND& targetHWND() const
@@ -36,12 +39,33 @@ namespace BF
 			virtual ~Renderer() = default;
 	};
 
-	class RendererD3D12 final : public Renderer
+	class RendererGDI final : public Renderer
 	{
-		ID3D12Device* device; // TODO
+		// TODO
 
 		virtual void init(HWND hWnd) override;
-		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, D3DCOLOR color) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const override;
+
+		public:
+			virtual void render() const override;
+
+			RendererGDI() = default;
+			RendererGDI(HWND overlayHWND, HWND targetHWND, Settings& s);
+	};
+
+	class RendererD3D12 final : public Renderer
+	{
+		ID3D12Device* device {};
+		// TODO
+
+		virtual void init(HWND hWnd) override;
+		virtual void drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, D3DCOLOR color) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const override;
 
 		public:
 			virtual void render() const override;
@@ -58,7 +82,10 @@ namespace BF
 		ID3DXFont*            font {};
 
 		virtual void init(HWND hWnd) override;
-		virtual void drawText(const string& str, int x, int y, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const override;
+		virtual void drawText(const wstring& str, int x, int y, D3DCOLOR color) const override;
+		virtual void drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const override;
 
 		public:
 			virtual void render() const override;

@@ -1,13 +1,15 @@
-﻿// Blue-Flag's External Menu.cpp : 定义应用程序的入口点。
-//
+﻿// Blue-Flag's External Menu.cpp
 
 #include "pch.hpp"
 #include "Blue-Flag's External Menu.hpp"
+#include "Memory.hpp"
+#include "Menu.hpp"
+#include "Renderer.hpp"
+#include "Settings.hpp"
 
 // 全局变量:
-HINSTANCE hInst;											// 当前实例
-wstring   OverlayTitle = L"Blue-Flag\'s External Menu";		// 标题
-HWND      OverlayHWND, TargetHWND;
+HINSTANCE     hInst;											// 当前实例
+HWND          OverlayHWND, TargetHWND;
 
 BF::Memory   GTA5;
 BF::Settings settings;
@@ -22,32 +24,34 @@ int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevIns
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	settings = BF::Settings("Blue-Flag.toml");
+	settings = BF::Settings(L"Blue-Flag.toml");
 
-	int           cnt;
-	const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
-	for (int i = 0; i < cnt; i++)
 	{
-		OutputDebugString(szArgList[i]);
-		if (!wcscmp(szArgList[i], L"--console-debug"))
+		int           cnt;
+		const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
+		for (int i = 0; i < cnt; i++)
 		{
-			MessageBox(nullptr, L"Console Debug Mode Enabled", L"Blue-Flag\'s External Menu", MB_OK);
-			AllocCon();
-			settings.ConsoleDebug = true;
-		}
-		if (!wcscmp(szArgList[i], L"--console"))
-		{
-			AllocCon();
-		}
-		if (!wcscmp(szArgList[i], L"--no-ui"))
-		{
-			MessageBox(nullptr, L"UI Disabled", L"Blue-Flag\'s External Menu", MB_OK);
-			settings.NoUI = true;
-		}
-		if (!wcscmp(szArgList[i], L"--skip-memory-init"))
-		{
-			MessageBox(nullptr, L"Memory Init Skipped", L"Blue-Flag\'s External Menu", MB_OK);
-			settings.SkipMemInit = true;
+			OutputDebugString(szArgList[i]);
+			if (!wcscmp(szArgList[i], L"--console-debug"))
+			{
+				MessageBox(nullptr, L"Console Debug Mode Enabled", OverlayTitle.c_str(), MB_OK);
+				AllocCon();
+				settings.ConsoleDebug = true;
+			}
+			if (!wcscmp(szArgList[i], L"--console"))
+			{
+				AllocCon();
+			}
+			if (!wcscmp(szArgList[i], L"--no-ui"))
+			{
+				MessageBox(nullptr, L"UI Disabled", OverlayTitle.c_str(), MB_OK);
+				settings.NoUI = true;
+			}
+			if (!wcscmp(szArgList[i], L"--skip-memory-init"))
+			{
+				MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
+				settings.SkipMemInit = true;
+			}
 		}
 	}
 
@@ -55,8 +59,6 @@ int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevIns
 	{
 		GTA5 = BF::Memory(L"GTA5.exe");
 	}
-
-	// TODO: 在此处放置代码
 
 	MyRegisterClass(hInstance);
 
@@ -161,17 +163,7 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 			}
 			if (settings.ConsoleDebug)
 			{
-				system("cls");  // NOLINT(concurrency-mt-unsafe)
-
-				const auto& menu  = tabs[cur_tab]->menu_stack.top();
-				const auto& items = menu->getItems();
-
-				cout << menu->getName() << endl;
-				for (int i = 0; i < items.size(); i++)
-				{
-					const auto& x = items[i];
-					cout << (i == menu->cur_item ? "> " : "  ") << (x->getType() == BF::Toggle_t ? (static_pointer_cast <BF::Toggle>(x)->IsOn() ? "[*]" : "[ ]") : "") << "\t" << x->getName() << (x->getType() == BF::Menu_t || x->getType() == BF::Submenu_t ? ">>" : "") << endl;
-				}
+				ShowConsoleDebugMenu();
 			}
 			EndPaint(hWnd, &ps);
 			break;
@@ -187,6 +179,54 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 		}
 	}
 	return 0;
+}
+
+void ShowConsoleDebugMenu()
+{
+	system("cls");  // NOLINT(concurrency-mt-unsafe)
+
+	const auto& menu  = tabs[cur_tab]->menu_stack.top();
+	const auto& items = menu->getItems();
+
+	cout << menu->getName() << endl;
+	for (int i = 0; i < items.size(); i++)
+	{
+		const auto& x = items[i];
+		cout << (i == menu->cur_item ? "> " : "  ");
+
+		if (x->getType() == BF::Toggle_t)
+		{
+			cout << (static_pointer_cast <BF::Toggle>(x)->IsOn() ? "[*]" : "[ ]");
+			break;
+		}
+		cout << "\t" << x->getName();
+		switch (x->getType())
+		{
+			case BF::Menu_t:
+			case BF::Submenu_t:
+			{
+				cout << ">>";
+				break;
+			}
+			case BF::Range_int_t:
+			{
+				cout << "< " << static_pointer_cast <BF::Range <int> >(x)->value() << " >";
+				break;
+			}
+			case BF::Range_float_t:
+			{
+				cout << "< " << static_pointer_cast <BF::Range <float> >(x)->value() << " >";
+				break;
+			}
+			default: ;
+		}
+		cout << endl;
+	}
+}
+
+void RefreshMenu()
+{
+	RedrawWindow(OverlayHWND, nullptr, nullptr, RDW_INTERNALPAINT);
 }
 
 void KillMenu()
@@ -214,6 +254,18 @@ void MenuSelect()
 			x->Excute();
 			break;
 		}
+		case BF::Range_int_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			x->Excute();
+			break;
+		}
+		case BF::Range_float_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			x->Excute();
+			break;
+		}
 		case BF::Menu_t:
 		case BF::Submenu_t:
 		{
@@ -224,11 +276,6 @@ void MenuSelect()
 	}
 }
 
-void RefreshMenu()
-{
-	RedrawWindow(OverlayHWND, nullptr, nullptr, RDW_INTERNALPAINT);
-}
-
 void MenuItemUp()
 {
 	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
@@ -236,7 +283,7 @@ void MenuItemUp()
 	{
 		return;
 	}
-	cur_menu->cur_item = (cur_menu->cur_item - 1 + cur_menu->getItems().size()) % cur_menu->getItems().size();
+	cur_menu->cur_item = (static_cast <unsigned long long>(cur_menu->cur_item) - 1 + cur_menu->getItems().size()) % cur_menu->getItems().size() % MAX_MENU_ITEM;
 }
 
 void MenuItemDown()
@@ -246,17 +293,59 @@ void MenuItemDown()
 	{
 		return;
 	}
-	cur_menu->cur_item = (cur_menu->cur_item + 1) % cur_menu->getItems().size();
+	cur_menu->cur_item = (static_cast <unsigned long long>(cur_menu->cur_item) + 1) % cur_menu->getItems().size() % MAX_MENU_ITEM;
+}
+
+void MenuLeft()
+{
+	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
+	{
+		case BF::Range_int_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			x->left();
+			break;
+		}
+		case BF::Range_float_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			x->left();
+			break;
+		}
+		default: ;
+	}
+}
+
+void MenuRight()
+{
+	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
+	{
+		case BF::Range_int_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			x->right();
+			break;
+		}
+		case BF::Range_float_t:
+		{
+			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			x->right();
+			break;
+		}
+		default: ;
+	}
 }
 
 void MenuTabLeft()
 {
-	cur_tab = (cur_tab - 1 + tabs.size()) % tabs.size();
+	cur_tab = (static_cast <unsigned long long>(cur_tab) - 1 + tabs.size()) % tabs.size() % MAX_MENU_ITEM;
 }
 
 void MenuTabRight()
 {
-	cur_tab = (cur_tab + 1) % tabs.size();
+	cur_tab = (static_cast <unsigned long long>(cur_tab) + 1) % tabs.size() % MAX_MENU_ITEM;
 }
 
 void MenuBack()
@@ -272,7 +361,10 @@ DWORD KeysThread(LPVOID lpParam)
 {
 	while (!settings.KillMenu)
 	{
-		GTA5.CheckKeys(settings);
+		if (_kbhit())
+		{
+			GTA5.CheckKeys(settings);
+		}
 		Sleep(1);
 	}
 	settings.KeysThreadKilled = true;
@@ -282,5 +374,6 @@ DWORD KeysThread(LPVOID lpParam)
 DWORD FuncThread(LPVOID lpParam)
 {
 	// TODO
+
 	return 0;
 }

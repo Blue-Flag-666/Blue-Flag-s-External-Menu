@@ -6,17 +6,17 @@ namespace BF
 {
 	class Settings
 	{
-		toml::table table;
-
 		void initDefault();
 
 		public:
 			int               OverlayWidth {}, OverlayHeight {};
 			bool              ActiveMenu {},   AlwaysShow {}, ConsoleDebug {}, KeysThreadKilled {}, KillMenu {}, NoUI {}, SkipMemInit {}, UseOldD3D {};
-			wstring           FontName {};
+			wstring           filename{L"Blue-Flag.toml"},FontName {};
 			map <string, int> keys {};
 
+			void savetofile();
+
 			Settings();
-			explicit Settings(const string& filename);
+			explicit Settings(const wstring& filename);
 	};
 }

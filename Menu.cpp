@@ -7,30 +7,9 @@ BF::MenuItem::MenuItem(const string& str, const int t)
 	type = t;
 }
 
-void BF::Action::Excute() const
-{
-	func();
-}
-
 BF::Action::Action(const string& str, const function <void()>& fun) : MenuItem(str, Action_t)
 {
 	func = fun;
-}
-
-const bool& BF::Toggle::IsOn() const
-{
-	return on;
-}
-
-bool BF::Toggle::toggle()
-{
-	on = !on;
-	return on;
-}
-
-void BF::Toggle::Excute()
-{
-	func(*this);
 }
 
 BF::Toggle::Toggle(const string& str, const function <void(Toggle&)>& fun): MenuItem(str, Toggle_t)
@@ -40,9 +19,13 @@ BF::Toggle::Toggle(const string& str, const function <void(Toggle&)>& fun): Menu
 	Excute();
 }
 
-void BF::Menu::clear()
+template <typename T> BF::Range <T>::Range(const string& str, T init, T mi, T ma, T d, function <void(T&)> fun): MenuItem(str, typeid(T) == typeid(int) ? Range_int_t : Range_float_t)
 {
-	items.clear();
+	cur   = init;
+	min   = mi;
+	max   = ma;
+	delta = d;
+	func  = fun;
 }
 
 void BF::Menu::add_action(const string& str, const function <void()>& fun)
@@ -57,6 +40,16 @@ void BF::Menu::add_toggle(const string& str, const function <void(Toggle&)>& fun
 	items.push_back(x);
 }
 
+template <typename T> void BF::Menu::add_range(const string& str, T init, T mi, T ma, T d, function <void(T&)> fun)
+{
+	if (typeid(T) != typeid(int) && typeid(T) != typeid(float))
+	{
+		return;
+	}
+	const auto x = static_pointer_cast <MenuItem>(make_shared <Range <T> >(str, init, mi, ma, d, fun));
+	items.push_back(x);
+}
+
 shared_ptr <BF::Submenu> BF::Menu::add_submenu(const string& str, const function <void()>& fun)
 {
 	const auto x = make_shared <Submenu>(str, fun);
@@ -64,7 +57,7 @@ shared_ptr <BF::Submenu> BF::Menu::add_submenu(const string& str, const function
 	return x;
 }
 
-BF::Menu::Menu(const string& str, const int t) : MenuItem(str, Menu_t)
+BF::Menu::Menu(const string& str, const int t) : MenuItem(str, t)
 {
 	cur_item = 0;
 }
@@ -76,7 +69,7 @@ BF::Submenu::Submenu(const string& str, const function <void()>& fun) : Menu(str
 
 BF::MenuTab::MenuTab(const shared_ptr <Menu> m)
 {
-	menu = m;
+	menu_stack.push(m);
 }
 
 void BF::InitMenu(vector <shared_ptr <MenuTab> >& tabs, const BF::Settings& settings)
@@ -97,16 +90,14 @@ void BF::InitMenu(vector <shared_ptr <MenuTab> >& tabs, const BF::Settings& sett
 			cout << "11" << endl;
 		});
 	m1->add_toggle
-		("t1", [](Toggle& toggle)
+		("t1", [](const Toggle& toggle)
 		{
 			if (toggle.IsOn())
 			{
 				cout << "toggled!" << endl;
-				toggle.toggle();
 			}
 		});
-
 	const auto m5 = m2->add_submenu("21");
 	const auto m6 = m5->add_submenu("51");
-	m2->clear();
+	m6->add_range <int>("int1", 5, 0, 10, 1, nullptr);
 }
