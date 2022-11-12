@@ -58,7 +58,7 @@ BOOL ListProcessModules(const uint32_t dwProcessId, const WCHAR szModule[MAX_MOD
 	return FALSE;
 }
 
-bool BF::Trainer::CheckKeyState(const int key)
+bool Trainer::CheckKeyState(const int key)
 {
 	if (clock() - keyTimer > 150 && GetAsyncKeyState(key) & 0x8000)
 	{
@@ -68,16 +68,16 @@ bool BF::Trainer::CheckKeyState(const int key)
 	return false;
 }
 
-void BF::Trainer::CheckKeys()
+void Trainer::CheckKeys()
 {
 }
 
-BF::Trainer::Trainer()
+Trainer::Trainer()
 {
 	keyTimer = clock();
 }
 
-void BF::Memory::CheckKeys(Settings& settings)
+void Memory::CheckKeys(Settings& settings)
 {
 	if (CheckKeyState(settings.keys["ToggleMenu"]))
 	{
@@ -122,7 +122,7 @@ void BF::Memory::CheckKeys(Settings& settings)
 	RefreshMenu();
 }
 
-BF::Memory::Memory()
+Memory::Memory()
 {
 	ProcessName   = L"";
 	ProcessID     = NULL;
@@ -131,7 +131,7 @@ BF::Memory::Memory()
 	Size          = NULL;
 }
 
-BF::Memory::Memory(const wstring& name)
+Memory::Memory(const wstring& name)
 {
 	ProcessName = name;
 

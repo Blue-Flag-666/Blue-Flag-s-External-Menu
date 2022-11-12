@@ -1,7 +1,7 @@
 ﻿#include "pch.hpp"
 #include "Settings.hpp"
 
-inline void BF::Settings::initDefault()
+void Settings::initDefault()
 {
 	OverlayWidth  = 1920;
 	OverlayHeight = 1080;
@@ -28,22 +28,22 @@ inline void BF::Settings::initDefault()
 	keys["MenuBack"]     = StrToVK("NUM0");
 }
 
-void BF::Settings::savetofile()
+void Settings::savetofile() const
 {
 	toml::table table;
-	table.insert("1", 1);
+	// TODO
 	ofstream savetofile(filename);
 	savetofile << toml::toml_formatter(toml::parse_result(table)) << endl;
 }
 
-BF::Settings::Settings()
+Settings::Settings()
 {
 	initDefault();
 }
 
-BF::Settings::Settings(const wstring& filename)
+Settings::Settings(const wstring& filename)
 {
-	if (!exists(filename))
+	if (!filesystem::exists(filename))
 	{
 		initDefault();
 		savetofile();
@@ -55,7 +55,7 @@ BF::Settings::Settings(const wstring& filename)
 	}
 	catch (const toml::parse_error& err)
 	{
-		const auto str = to_wstring(err.description().data()) + L"\n(error occurred at line " + std::to_wstring(err.source().begin.line) + L", column " + std::to_wstring(err.source().begin.column) + L" of '" + to_wstring(*err.source().path) + L"')";
+		const auto str = to_wstring(err.description().data()) + L"\n(error occurred at line " + to_wstring(err.source().begin.line) + L", column " + to_wstring(err.source().begin.column) + L" of '" + to_wstring(*err.source().path) + L"')";
 		MessageBox(nullptr, str.c_str(), L"Parsing Failed",MB_OK);
 		initDefault();
 	}

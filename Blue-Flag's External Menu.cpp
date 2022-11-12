@@ -8,56 +8,31 @@
 #include "Settings.hpp"
 
 // 全局变量:
-HINSTANCE     hInst;											// 当前实例
-HWND          OverlayHWND, TargetHWND;
+HINSTANCE hInst;											// 当前实例
+HWND      OverlayHWND, TargetHWND;
 
-BF::Memory   GTA5;
-BF::Settings settings;
+Memory   GTA5;
+Settings settings;
 
-shared_ptr <BF::Renderer> renderer;
+shared_ptr <Renderer> renderer;
 
-vector <shared_ptr <BF::MenuTab> > tabs;
-int                                cur_tab = 0;
+vector <shared_ptr <MenuTab> > tabs;
+int                            cur_tab = 0;
 
-int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ const LPWSTR lpCmdLine,_In_ const int nCmdShow)
+int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ const LPWSTR lpCmdLine,_In_ const int nShowCmd)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	settings = BF::Settings(L"Blue-Flag.toml");
+	setlocale(LC_ALL, "chs");
 
-	{
-		int           cnt;
-		const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
-		for (int i = 0; i < cnt; i++)
-		{
-			OutputDebugString(szArgList[i]);
-			if (!wcscmp(szArgList[i], L"--console-debug"))
-			{
-				MessageBox(nullptr, L"Console Debug Mode Enabled", OverlayTitle.c_str(), MB_OK);
-				AllocCon();
-				settings.ConsoleDebug = true;
-			}
-			if (!wcscmp(szArgList[i], L"--console"))
-			{
-				AllocCon();
-			}
-			if (!wcscmp(szArgList[i], L"--no-ui"))
-			{
-				MessageBox(nullptr, L"UI Disabled", OverlayTitle.c_str(), MB_OK);
-				settings.NoUI = true;
-			}
-			if (!wcscmp(szArgList[i], L"--skip-memory-init"))
-			{
-				MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
-				settings.SkipMemInit = true;
-			}
-		}
-	}
+	settings = Settings(L"Blue-Flag.toml");
+
+	ParseCmdLine(lpCmdLine);
 
 	if (!settings.SkipMemInit)
 	{
-		GTA5 = BF::Memory(L"GTA5.exe");
+		GTA5 = Memory(L"GTA5.exe");
 	}
 
 	MyRegisterClass(hInstance);
@@ -71,14 +46,14 @@ int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevIns
 	InitMenu(tabs, settings);
 
 	// 执行应用程序初始化:
-	if (!InitInstance(hInstance, nCmdShow))
+	if (!InitInstance(hInstance, nShowCmd))
 	{
 		return FALSE;
 	}
 
 	if (!settings.NoUI)
 	{
-		settings.UseOldD3D ? renderer = std::make_shared <BF::RendererD3D9>(OverlayHWND, TargetHWND, settings) : renderer = std::make_shared <BF::RendererD3D12>(OverlayHWND, TargetHWND, settings);
+		settings.UseOldD3D ? renderer = make_shared <RendererD3D9>(OverlayHWND, TargetHWND, settings) : renderer = make_shared <RendererD3D12>(OverlayHWND, TargetHWND, settings);
 	}
 
 	MoveWindow(OverlayHWND, 0, 0, settings.OverlayWidth, settings.OverlayHeight, true);
@@ -181,6 +156,48 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 	return 0;
 }
 
+void ParseCmdLine(const LPWSTR lpCmdLine, bool usingDefaultConfig, const bool secondTry)
+{
+	int           cnt       = 0;
+	const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
+	for (int i = 0; i < cnt; i++)
+	{
+		OutputDebugString(szArgList[i]);
+		if (!usingDefaultConfig && !wcscmp(szArgList[i], L"--default-config"))
+		{
+			MessageBox(nullptr, L"Using Default Config", OverlayTitle.c_str(), MB_OK);
+			AllocCon();
+			usingDefaultConfig = true;
+			break;
+		}
+		if (!wcscmp(szArgList[i], L"--console-debug"))
+		{
+			MessageBox(nullptr, L"Console Debug Mode Enabled", OverlayTitle.c_str(), MB_OK);
+			AllocCon();
+			settings.ConsoleDebug = true;
+		}
+		if (!wcscmp(szArgList[i], L"--console"))
+		{
+			AllocCon();
+		}
+		if (!wcscmp(szArgList[i], L"--no-ui"))
+		{
+			MessageBox(nullptr, L"UI Disabled", OverlayTitle.c_str(), MB_OK);
+			settings.NoUI = true;
+		}
+		if (!wcscmp(szArgList[i], L"--skip-memory-init"))
+		{
+			MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
+			settings.SkipMemInit = true;
+		}
+	}
+	if (usingDefaultConfig && !secondTry)
+	{
+		settings.initDefault();
+		ParseCmdLine(lpCmdLine, true, true);
+	}
+}
+
 void ShowConsoleDebugMenu()
 {
 	system("cls");  // NOLINT(concurrency-mt-unsafe)
@@ -192,35 +209,7 @@ void ShowConsoleDebugMenu()
 	for (int i = 0; i < items.size(); i++)
 	{
 		const auto& x = items[i];
-		cout << (i == menu->cur_item ? "> " : "  ");
-
-		if (x->getType() == BF::Toggle_t)
-		{
-			cout << (static_pointer_cast <BF::Toggle>(x)->IsOn() ? "[*]" : "[ ]");
-			break;
-		}
-		cout << "\t" << x->getName();
-		switch (x->getType())
-		{
-			case BF::Menu_t:
-			case BF::Submenu_t:
-			{
-				cout << ">>";
-				break;
-			}
-			case BF::Range_int_t:
-			{
-				cout << "< " << static_pointer_cast <BF::Range <int> >(x)->value() << " >";
-				break;
-			}
-			case BF::Range_float_t:
-			{
-				cout << "< " << static_pointer_cast <BF::Range <float> >(x)->value() << " >";
-				break;
-			}
-			default: ;
-		}
-		cout << endl;
+		cout << (i == menu->cur_item ? "> " : "  ") << x->show();
 	}
 }
 
@@ -242,34 +231,34 @@ void MenuSelect()
 	}
 	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
-		case BF::Action_t:
+		case Action_t:
 		{
-			static_pointer_cast <BF::Action>(cur_item)->Excute();
+			static_pointer_cast <Action>(cur_item)->Excute();
 			break;
 		}
-		case BF::Toggle_t:
+		case Toggle_t:
 		{
-			const auto x = static_pointer_cast <BF::Toggle>(cur_item);
+			const auto x = static_pointer_cast <Toggle>(cur_item);
 			x->toggle();
 			x->Excute();
 			break;
 		}
-		case BF::Range_int_t:
+		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int> >(cur_item);
 			x->Excute();
 			break;
 		}
-		case BF::Range_float_t:
+		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float> >(cur_item);
 			x->Excute();
 			break;
 		}
-		case BF::Menu_t:
-		case BF::Submenu_t:
+		case Menu_t:
+		case Submenu_t:
 		{
-			tabs[cur_tab]->menu_stack.push(static_pointer_cast <BF::Menu>(cur_item));
+			tabs[cur_tab]->menu_stack.push(static_pointer_cast <Menu>(cur_item));
 			break;
 		}
 		default: ;
@@ -301,15 +290,15 @@ void MenuLeft()
 	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
 	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
-		case BF::Range_int_t:
+		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int> >(cur_item);
 			x->left();
 			break;
 		}
-		case BF::Range_float_t:
+		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float> >(cur_item);
 			x->left();
 			break;
 		}
@@ -322,15 +311,15 @@ void MenuRight()
 	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
 	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
-		case BF::Range_int_t:
+		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int> >(cur_item);
 			x->right();
 			break;
 		}
-		case BF::Range_float_t:
+		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <BF::Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float> >(cur_item);
 			x->right();
 			break;
 		}

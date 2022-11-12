@@ -2,71 +2,55 @@
 #include "Renderer.hpp"
 #include "Blue-Flag's External Menu.hpp"
 
-BF::Renderer::Renderer(const HWND targetHWND, Settings& s)
+Renderer::Renderer(const HWND targetHWND, Settings& s)
 {
 	TargetHWND = targetHWND;
 	settings   = shared_ptr <Settings>(&s);
 }
 
-void BF::RendererGDI::init(HWND hWnd)
+void RendererGDI::init(HWND hWnd)
 {
 }
 
-void BF::RendererGDI::drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const
+void RendererGDI::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
 {
 }
 
-void BF::RendererGDI::drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const
+void RendererGDI::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
 {
 }
 
-void BF::RendererGDI::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
+void RendererGDI::render() const
 {
 }
 
-void BF::RendererGDI::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const
-{
-}
-
-void BF::RendererGDI::render() const
-{
-}
-
-BF::RendererGDI::RendererGDI(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
+RendererGDI::RendererGDI(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
 	init(overlayHWND);
 }
 
-void BF::RendererD3D12::init(HWND hWnd)
+void RendererD3D12::init(HWND hWnd)
 {
 }
 
-void BF::RendererD3D12::drawText(const wstring& str, int x, int y, int a, int r, int g, int b) const
+void RendererD3D12::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
 {
 }
 
-void BF::RendererD3D12::drawText(const wstring& str, int x, int y, int w, int h, int a, int r, int g, int b) const
+void RendererD3D12::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
 {
 }
 
-void BF::RendererD3D12::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
+void RendererD3D12::render() const
 {
 }
 
-void BF::RendererD3D12::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color) const
-{
-}
-
-void BF::RendererD3D12::render() const
-{
-}
-
-BF::RendererD3D12::RendererD3D12(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
+RendererD3D12::RendererD3D12(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
 	init(overlayHWND);
 }
 
-void BF::RendererD3D9::init(const HWND hWnd)
+void RendererD3D9::init(const HWND hWnd)
 {
 	if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &object)))
 	{
@@ -105,31 +89,31 @@ void BF::RendererD3D9::init(const HWND hWnd)
 	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, settings->FontName.c_str(), &font);
 }
 
-void BF::RendererD3D9::drawText(const wstring& str, const int x, const int y, const int a, const int r, const int g, const int b) const
-{
-	RECT rect = { x, y };
-	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, D3DCOLOR_ARGB(a, r, g, b));
-}
-
-void BF::RendererD3D9::drawText(const wstring& str, const int x, const int y, const int w, const int h, const int a, const int r, const int g, const int b) const
-{
-	RECT rect = { x, y, x + w, y + h };
-	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, D3DCOLOR_ARGB(a, r, g, b));
-}
-
-void BF::RendererD3D9::drawText(const wstring& str, const int x, const int y, const D3DCOLOR color) const
+void RendererD3D9::drawText(const wstring& str, const int x, const int y, const D3DCOLOR color) const
 {
 	RECT rect = { x, y };
 	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
 }
 
-void BF::RendererD3D9::drawText(const wstring& str, const int x, const int y, const int w, const int h, const D3DCOLOR color) const
+void RendererD3D9::drawText(const wstring& str, const int x, const int y, const int w, const int h, const D3DCOLOR color, DWORD flags) const
 {
 	RECT rect = { x, y, x + w, y + h };
 	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
 }
 
-void BF::RendererD3D9::render() const
+void RendererD3D9::drawBox(const int x, const int y, const int w, const int h, const D3DCOLOR color) const
+{
+	const D3DRECT rect = { x, y, x + w, y + h };
+	device->Clear(1, &rect, D3DCLEAR_TARGET, color, 1.f, 0);
+}
+
+void RendererD3D9::drawBoxBorder(const int x, const int y, const int w, const int h, const int borderSize, const D3DCOLOR color, const D3DCOLOR borderColor) const
+{
+	drawBox(x, y, w, h, borderColor);
+	drawBox(x + borderSize, y + borderSize, w - borderSize * 2, h - borderSize * 2, color);
+}
+
+void RendererD3D9::render() const
 {
 	OutputDebugString(L"Renderer Called\n");
 
@@ -143,14 +127,15 @@ void BF::RendererD3D9::render() const
 
 	if (const auto settings = getSettings(); settings->ActiveMenu && (settings->AlwaysShow || targetHWND() == GetForegroundWindow()))
 	{
-		drawText(L"OK", settings->OverlayWidth / 10, settings->OverlayHeight / 10, 255, 30, 144, 255);
+		drawBoxBorder(settings->OverlayWidth / 10, settings->OverlayHeight / 10, 600, 260, 2, D3DCOLOR_ARGB(255, 56, 120, 226),D3DCOLOR_ARGB(255, 1, 1, 1));
+		drawText(OverlayTitle, settings->OverlayWidth / 10, settings->OverlayHeight / 10, 300, 25, D3DCOLOR_ARGB(255, 1, 1, 1),DT_CENTER | DT_VCENTER);
 	}
 
 	device->EndScene();
 	device->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 }
 
-BF::RendererD3D9::RendererD3D9(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
+RendererD3D9::RendererD3D9(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
 	init(overlayHWND);
 }

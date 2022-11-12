@@ -7,14 +7,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Blue-Flag's External Menu",
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Release|x64 = Release|x64
+		Build Release|x64 = Build Release|x64
+		Try Debug|x64 = Try Debug|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Debug|x64.ActiveCfg = Debug|x64
-		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Debug|x64.Build.0 = Debug|x64
-		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Release|x64.ActiveCfg = Release|x64
-		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Release|x64.Build.0 = Release|x64
+		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Build Release|x64.ActiveCfg = Build Release|x64
+		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Build Release|x64.Build.0 = Build Release|x64
+		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Try Debug|x64.ActiveCfg = Try Debug|x64
+		{BCAFB22E-194B-4736-97C6-00E5F01155AB}.Try Debug|x64.Build.0 = Try Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
