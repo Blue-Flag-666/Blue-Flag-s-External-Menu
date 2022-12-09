@@ -1,25 +1,20 @@
-Ôªø//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
-// ‰æõ Blue-Flag's External Menu.rc ‰ΩøÁî®
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
+// π© Blue-Flag's External Menu.rc  π”√
 //
-#define IDC_MYICON                      2
-#define IDD_BLUEFLAGSEXTERNALMENU_DIALOG 102
-#define IDS_APP_TITLE                   103
-#define IDM_ABOUT                       104
-#define IDI_BLUEFLAGSEXTERNALMENU       107
-#define IDI_SMALL                       108
-#define IDC_BLUEFLAGSEXTERNALMENU       109
-#define IDR_MAINFRAME                   128
-#define IDC_STATIC                      -1
+#define IDI_BLUEFLAGSEXTERNALMENU       101
+#define IDB_HEADER_LARGE                102
+#define IDB_HEADER_SMALL                103
+#define IDB_HEADER_SMALL_ORG            104
+#define IDB_ICON_PNG                        105
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        129
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           110
+#define _APS_NEXT_RESOURCE_VALUE        106
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -12,11 +12,23 @@ void RendererGDI::init(HWND hWnd)
 {
 }
 
-void RendererGDI::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
+void RendererGDI::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const
 {
 }
 
-void RendererGDI::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
+void RendererGDI::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
+{
+}
+
+void RendererGDI::drawBox(int x, int y, int w, int h, D3DCOLOR color) const
+{
+}
+
+void RendererGDI::drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const
+{
+}
+
+void RendererGDI::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const
 {
 }
 
@@ -33,11 +45,23 @@ void RendererD3D12::init(HWND hWnd)
 {
 }
 
-void RendererD3D12::drawText(const wstring& str, int x, int y, D3DCOLOR color) const
+void RendererD3D12::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const
 {
 }
 
-void RendererD3D12::drawText(const wstring& str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
+void RendererD3D12::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
+{
+}
+
+void RendererD3D12::drawBox(int x, int y, int w, int h, D3DCOLOR color) const
+{
+}
+
+void RendererD3D12::drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const
+{
+}
+
+void RendererD3D12::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const
 {
 }
 
@@ -86,19 +110,20 @@ void RendererD3D9::init(const HWND hWnd)
 		KillMenu();
 	}
 	device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, true);
-	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, settings->FontName.c_str(), &font);
+	D3DXCreateFont(device, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, getRendererSettings().FontName.c_str(), &font);
+	D3DXCreateSprite(device, &sprite);
 }
 
-void RendererD3D9::drawText(const wstring& str, const int x, const int y, const D3DCOLOR color) const
+void RendererD3D9::drawText(const wstring_view str, const int x, const int y, const D3DCOLOR color) const
 {
 	RECT rect = { x, y };
-	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
+	font->DrawText(nullptr, str.data(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
 }
 
-void RendererD3D9::drawText(const wstring& str, const int x, const int y, const int w, const int h, const D3DCOLOR color, DWORD flags) const
+void RendererD3D9::drawText(const wstring_view str, const int x, const int y, const int w, const int h, const D3DCOLOR color, DWORD flags) const
 {
 	RECT rect = { x, y, x + w, y + h };
-	font->DrawTextW(nullptr, str.c_str(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
+	font->DrawText(nullptr, str.data(), static_cast <int>(str.size()), &rect, DT_NOCLIP, color);
 }
 
 void RendererD3D9::drawBox(const int x, const int y, const int w, const int h, const D3DCOLOR color) const
@@ -113,10 +138,23 @@ void RendererD3D9::drawBoxBorder(const int x, const int y, const int w, const in
 	drawBox(x + borderSize, y + borderSize, w - borderSize * 2, h - borderSize * 2, color);
 }
 
+void RendererD3D9::drawImage(const int x, const int y, const wstring_view name, const LPWSTR res = nullptr) const
+{
+	LPDIRECT3DTEXTURE9 texture;
+	if (res)
+	{
+		D3DXCreateTextureFromResource(device, nullptr, res, &texture);
+	}
+	else
+	{
+		D3DXCreateTextureFromFile(device, name.data(), &texture);
+	}
+	const auto pos = D3DXVECTOR3(static_cast <float>(x), static_cast <float>(y), 0);
+	sprite->Draw(texture, nullptr, nullptr, &pos, D3DCOLOR_ARGB(255, 255, 255, 255));
+}
+
 void RendererD3D9::render() const
 {
-	OutputDebugString(L"Renderer Called\n");
-
 	if (device == nullptr)
 	{
 		return;
@@ -124,13 +162,17 @@ void RendererD3D9::render() const
 
 	device->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 	device->BeginScene();
+	sprite->Begin(D3DXSPRITE_ALPHABLEND);
 
 	if (const auto settings = getSettings(); settings->ActiveMenu && (settings->AlwaysShow || targetHWND() == GetForegroundWindow()))
 	{
-		drawBoxBorder(settings->OverlayWidth / 10, settings->OverlayHeight / 10, 600, 260, 2, D3DCOLOR_ARGB(255, 56, 120, 226),D3DCOLOR_ARGB(255, 1, 1, 1));
-		drawText(OverlayTitle, settings->OverlayWidth / 10, settings->OverlayHeight / 10, 300, 25, D3DCOLOR_ARGB(255, 1, 1, 1),DT_CENTER | DT_VCENTER);
+		drawBoxBorder(getRendererSettings().MenuX, getRendererSettings().MenuY, getRendererSettings().MenuWidth, getRendererSettings().MenuHeight, getRendererSettings().BorderSize, D3DCOLOR_ARGB(255, 56, 120, 226),D3DCOLOR_ARGB(255, 1, 1, 1));
+		drawText(OverlayTitle, getRendererSettings().MenuX + 10, getRendererSettings().MenuY + 10, 300, 25, D3DCOLOR_ARGB(255, 1, 1, 1),DT_CENTER | DT_VCENTER);
+
+		drawImage(250, 250, L"",MAKEINTRESOURCE(IDB_ICON_PNG));
 	}
 
+	sprite->End();
 	device->EndScene();
 	device->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 }

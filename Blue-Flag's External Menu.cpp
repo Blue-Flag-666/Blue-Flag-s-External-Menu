@@ -8,21 +8,23 @@
 #include "Settings.hpp"
 
 // 全局变量:
-HINSTANCE hInst;											// 当前实例
-HWND      OverlayHWND, TargetHWND;
-
-Memory   GTA5;
-Settings settings;
-
+HINSTANCE             hInst;											// 当前实例
+HWND                  OverlayHWND, TargetHWND;
+Memory                GTA5;
+Settings              settings;
+Tabs                  tabs;
 shared_ptr <Renderer> renderer;
-
-vector <shared_ptr <MenuTab> > tabs;
-int                            cur_tab = 0;
+int                   cur_tab = 0;
 
 int APIENTRY wWinMain(_In_ const HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ const LPWSTR lpCmdLine,_In_ const int nShowCmd)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	ios::sync_with_stdio(false);
+	ios_base::sync_with_stdio(false);
+	cout.tie(nullptr);
+	wcout.tie(nullptr);
 
 	setlocale(LC_ALL, "chs");
 
@@ -162,7 +164,6 @@ void ParseCmdLine(const LPWSTR lpCmdLine, bool usingDefaultConfig, const bool se
 	const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
 	for (int i = 0; i < cnt; i++)
 	{
-		OutputDebugString(szArgList[i]);
 		if (!usingDefaultConfig && !wcscmp(szArgList[i], L"--default-config"))
 		{
 			MessageBox(nullptr, L"Using Default Config", OverlayTitle.c_str(), MB_OK);
@@ -188,6 +189,7 @@ void ParseCmdLine(const LPWSTR lpCmdLine, bool usingDefaultConfig, const bool se
 		if (!wcscmp(szArgList[i], L"--skip-memory-init"))
 		{
 			MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
+			settings.AlwaysShow  = true;
 			settings.SkipMemInit = true;
 		}
 	}
@@ -200,16 +202,16 @@ void ParseCmdLine(const LPWSTR lpCmdLine, bool usingDefaultConfig, const bool se
 
 void ShowConsoleDebugMenu()
 {
-	system("cls");  // NOLINT(concurrency-mt-unsafe)
+	ClearConsole();
 
-	const auto& menu  = tabs[cur_tab]->menu_stack.top();
+	const auto& menu  = tabs.tabs[cur_tab]->menu_stack.top();
 	const auto& items = menu->getItems();
 
 	cout << menu->getName() << endl;
+
 	for (int i = 0; i < items.size(); i++)
 	{
-		const auto& x = items[i];
-		cout << (i == menu->cur_item ? "> " : "  ") << x->show();
+		cout << (i == menu->cur_item ? "> " : "  ") << items[i]->show();
 	}
 }
 
@@ -224,7 +226,7 @@ void KillMenu()
 
 void MenuSelect()
 {
-	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs.tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;
@@ -258,7 +260,7 @@ void MenuSelect()
 		case Menu_t:
 		case Submenu_t:
 		{
-			tabs[cur_tab]->menu_stack.push(static_pointer_cast <Menu>(cur_item));
+			tabs.tabs[cur_tab]->menu_stack.push(static_pointer_cast <Menu>(cur_item));
 			break;
 		}
 		default: ;
@@ -267,7 +269,7 @@ void MenuSelect()
 
 void MenuItemUp()
 {
-	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs.tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;
@@ -277,7 +279,7 @@ void MenuItemUp()
 
 void MenuItemDown()
 {
-	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs.tabs[cur_tab]->menu_stack.top();
 	if (cur_menu->getItems().empty())
 	{
 		return;
@@ -287,7 +289,7 @@ void MenuItemDown()
 
 void MenuLeft()
 {
-	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs.tabs[cur_tab]->menu_stack.top();
 	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
 		case Range_int_t:
@@ -308,7 +310,7 @@ void MenuLeft()
 
 void MenuRight()
 {
-	const auto& cur_menu = tabs[cur_tab]->menu_stack.top();
+	const auto& cur_menu = tabs.tabs[cur_tab]->menu_stack.top();
 	switch (const auto cur_item = cur_menu->getItems()[cur_menu->cur_item]; cur_item->getType())
 	{
 		case Range_int_t:
@@ -329,21 +331,21 @@ void MenuRight()
 
 void MenuTabLeft()
 {
-	cur_tab = (static_cast <unsigned long long>(cur_tab) - 1 + tabs.size()) % tabs.size() % MAX_MENU_ITEM;
+	cur_tab = (static_cast <unsigned long long>(cur_tab) - 1 + tabs.tabs.size()) % tabs.tabs.size() % MAX_MENU_ITEM;
 }
 
 void MenuTabRight()
 {
-	cur_tab = (static_cast <unsigned long long>(cur_tab) + 1) % tabs.size() % MAX_MENU_ITEM;
+	cur_tab = (static_cast <unsigned long long>(cur_tab) + 1) % tabs.tabs.size() % MAX_MENU_ITEM;
 }
 
 void MenuBack()
 {
-	if (tabs[cur_tab]->menu_stack.size() <= 1)
+	if (tabs.tabs[cur_tab]->menu_stack.size() <= 1)
 	{
 		return;
 	}
-	tabs[cur_tab]->menu_stack.pop();
+	tabs.tabs[cur_tab]->menu_stack.pop();
 }
 
 DWORD KeysThread(LPVOID lpParam)

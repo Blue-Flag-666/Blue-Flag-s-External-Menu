@@ -36,9 +36,6 @@
     <ClInclude Include="framework.hpp">
       <Filter>头文件\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>头文件\Misc</Filter>
     </ClInclude>
@@ -55,6 +52,9 @@
       <Filter>头文件\Menu</Filter>
     </ClInclude>
     <ClInclude Include="Blue-Flag%27s External Menu.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -79,19 +79,42 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\Blue-Flag%27s External Menu.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Blue-Flag-Text-PNG-Large.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Blue-Flag-Text-PNG-Small.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Blue-Flag-Text-PNG-Small-org.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\small.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Blue-Flag%27s External Menu.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resource\Blue-Flag-Text-Plain-Large.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="Resource\Blue-Flag-Text-Plain-Small.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
     <ResourceCompile Include="Blue-Flag%27s External Menu.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="Blue-Flag%27s External Menu.ico">
-      <Filter>资源文件</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

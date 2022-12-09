@@ -12,7 +12,7 @@ namespace BF
 		string name;
 		int    type = MenuItem_t;
 		public:
-			[[nodiscard]] const string& getName() const
+			[[nodiscard]] string_view getName() const
 			{
 				return name;
 			}
@@ -28,7 +28,7 @@ namespace BF
 			}
 
 			MenuItem() = default;
-			explicit MenuItem(const string& str, int t = MenuItem_t);
+			explicit MenuItem(string_view str, int t = MenuItem_t);
 			virtual  ~MenuItem() = default;
 	};
 
@@ -43,11 +43,11 @@ namespace BF
 
 			[[nodiscard]] virtual string show() const override
 			{
-				return "\t" + getName() + "\n";
+				return "\t" + string(getName()) + "\n";
 			}
 
 			Action() = default;
-			explicit Action(const string& str, const function <void()>& fun);
+			explicit Action(string_view str, const function <void()>& fun);
 	};
 
 	class Toggle final : public MenuItem
@@ -72,11 +72,11 @@ namespace BF
 
 			[[nodiscard]] virtual string show() const override
 			{
-				return (on ? "[*]\t" : "[ ]\t") + getName() + "\n";
+				return (on ? "[*]\t" : "[ ]\t") + string(getName()) + "\n";
 			}
 
 			Toggle() = default;
-			Toggle(const string& str, const function <void(Toggle&)>& fun);
+			Toggle(string_view str, const function <void(Toggle&)>& fun);
 	};
 
 	template <typename T> requires std::integral <T> || std::floating_point <T>
@@ -115,10 +115,10 @@ namespace BF
 
 			[[nodiscard]] virtual string show() const override
 			{
-				return "\t" + getName() + "\t< " + to_string(cur) + " >\n";
+				return "\t" + string(getName()) + "\t< " + to_string(cur) + " >\n";
 			}
 
-			Range(const string& str, T init, T mi, T ma, T d, const function <void(T&)>& fun);
+			Range(string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun);
 	};
 
 	class Submenu;
@@ -141,17 +141,17 @@ namespace BF
 
 			[[nodiscard]] virtual string show() const override
 			{
-				return "\t" + getName() + "\t>>\n";
+				return "\t" + string(getName()) + "\t>>\n";
 			}
 
-			void add_action(const string& str, const function <void()>& fun);
-			void add_toggle(const string& str, const function <void(Toggle&)>& fun);
+			void add_action(string_view str, const function <void()>& fun);
+			void add_toggle(string_view str, const function <void(Toggle&)>& fun);
 			template <typename T> requires std::integral <T> || std::floating_point <T>
-			void                 add_range(const string& str, T init, T mi, T ma, T d, const function <void(T&)>& fun);
-			shared_ptr <Submenu> add_submenu(const string& str, const function <void()>& fun = nullptr);
+			void                 add_range(string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun);
+			shared_ptr <Submenu> add_submenu(string_view str, const function <void()>& fun = nullptr);
 
 			Menu() = default;
-			explicit Menu(const string& str, int t = Menu_t);
+			explicit Menu(string_view str, int t = Menu_t);
 	};
 
 	class Submenu final : public Menu
@@ -159,7 +159,7 @@ namespace BF
 		function <void()> func;
 		public:
 			Submenu() = default;
-			explicit Submenu(const string& str, const function <void()>& fun);
+			explicit Submenu(string_view str, const function <void()>& fun);
 	};
 
 	struct MenuTab
@@ -170,7 +170,16 @@ namespace BF
 		explicit MenuTab(shared_ptr <Menu> m);
 	};
 
-	void InitMenu(vector <shared_ptr <MenuTab> >& tabs, const Settings& settings);
+	struct Tabs
+	{
+		vector <shared_ptr <MenuTab> > tabs;
+
+		Tabs() = default;
+
+		shared_ptr <Menu> add_tab(string name);
+	};
+
+	void InitMenu(Tabs& tabs, const Settings& settings);
 
 	template <typename T> ItemType getTypeName()
 	{

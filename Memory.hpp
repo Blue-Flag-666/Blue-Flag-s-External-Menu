@@ -10,7 +10,7 @@ namespace BF
 		public:
 			clock_t keyTimer;
 
-			bool         CheckKeyState(int key);
+			bool         CheckKeyState(string_view key);
 			virtual void CheckKeys();
 
 			Trainer& operator=(const Trainer&) = default;
@@ -26,12 +26,13 @@ namespace BF
 	{
 		wstring  ProcessName;
 		HANDLE   ProcessHandle;
+		HWND     ProcessHWND;
 		UINT     ProcessID;
 		UINT_PTR BaseAddr;
 		UINT     Size;
 
 		public:
-			[[nodiscard]] wstring name() const
+			[[nodiscard]] wstring_view name() const
 			{
 				return ProcessName;
 			}
@@ -39,6 +40,11 @@ namespace BF
 			[[nodiscard]] HANDLE handle() const
 			{
 				return ProcessHandle;
+			}
+
+			[[nodiscard]] HWND hwnd() const
+			{
+				return ProcessHWND;
 			}
 
 			[[nodiscard]] UINT pid() const
@@ -56,14 +62,9 @@ namespace BF
 				return Size;
 			}
 
-			[[nodiscard]] HWND hwnd() const
-			{
-				return static_cast <HWND>(ProcessHandle);
-			}
-
 			void CheckKeys(Settings& settings);
 
 			Memory();
-			explicit Memory(const wstring& name);
+			explicit Memory(wstring_view name);
 	};
 }

@@ -2,6 +2,41 @@
 #include "Memory.hpp"
 #include "Blue-Flag's External Menu.hpp"
 
+typedef struct ST_WNDINFO
+{
+	HWND  hWnd;
+	DWORD dwProcessId;
+}         WNDINFO,* LPWNDINFO;
+
+union LPWNDINFO_t
+{
+	LPWNDINFO info;
+	LPARAM    ptr;
+
+	explicit LPWNDINFO_t(const LPARAM p): ptr(p)
+	{
+	}
+};
+
+HWND GetProcessMainWnd(const DWORD dwProcessId)
+{
+	WNDINFO wndInfo { nullptr, dwProcessId };
+	EnumWindows
+		([](const HWND hWnd, const LPARAM lParam) ->BOOL
+		{
+			DWORD ProcessId = 0;
+			GetWindowThreadProcessId(hWnd, &ProcessId);
+			if (const auto pInfo = LPWNDINFO_t(lParam).info; ProcessId == pInfo->dwProcessId)
+			{
+				pInfo->hWnd = hWnd;
+				return FALSE;
+			}
+			return TRUE;
+		}, reinterpret_cast <LPARAM>(&wndInfo));
+
+	return wndInfo.hWnd;
+}
+
 BOOL ListSystemProcesses(WCHAR szExeFile[MAX_PATH], const LPPROCESSENTRY32 PE32)
 {
 	const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -58,9 +93,9 @@ BOOL ListProcessModules(const uint32_t dwProcessId, const WCHAR szModule[MAX_MOD
 	return FALSE;
 }
 
-bool Trainer::CheckKeyState(const int key)
+bool Trainer::CheckKeyState(const string_view key)
 {
-	if (clock() - keyTimer > 150 && GetAsyncKeyState(key) & 0x8000)
+	if (clock() - keyTimer > 100 && GetAsyncKeyState(StrToVK(key)) & 0x8000)
 	{
 		keyTimer = clock();
 		return true;
@@ -79,39 +114,39 @@ Trainer::Trainer()
 
 void Memory::CheckKeys(Settings& settings)
 {
-	if (CheckKeyState(settings.keys["ToggleMenu"]))
+	if (CheckKeyState(settings.Keys["ToggleMenu"]))
 	{
 		settings.ActiveMenu = !settings.ActiveMenu;
 	}
-	else if (CheckKeyState(settings.keys["MenuSelect"]))
+	else if (CheckKeyState(settings.Keys["MenuSelect"]))
 	{
 		MenuSelect();
 	}
-	else if (CheckKeyState(settings.keys["MenuUp"]))
+	else if (CheckKeyState(settings.Keys["MenuUp"]))
 	{
 		MenuItemUp();
 	}
-	else if (CheckKeyState(settings.keys["MenuDown"]))
+	else if (CheckKeyState(settings.Keys["MenuDown"]))
 	{
 		MenuItemDown();
 	}
-	else if (CheckKeyState(settings.keys["MenuLeft"]))
+	else if (CheckKeyState(settings.Keys["MenuLeft"]))
 	{
 		MenuLeft();
 	}
-	else if (CheckKeyState(settings.keys["MenuRight"]))
+	else if (CheckKeyState(settings.Keys["MenuRight"]))
 	{
 		MenuRight();
 	}
-	else if (CheckKeyState(settings.keys["MenuTabLeft"]))
+	else if (CheckKeyState(settings.Keys["MenuTabLeft"]))
 	{
 		MenuTabLeft();
 	}
-	else if (CheckKeyState(settings.keys["MenuTabRight"]))
+	else if (CheckKeyState(settings.Keys["MenuTabRight"]))
 	{
 		MenuTabRight();
 	}
-	else if (CheckKeyState(settings.keys["MenuBack"]))
+	else if (CheckKeyState(settings.Keys["MenuBack"]))
 	{
 		MenuBack();
 	}
@@ -127,29 +162,31 @@ Memory::Memory()
 	ProcessName   = L"";
 	ProcessID     = NULL;
 	ProcessHandle = nullptr;
+	ProcessHWND   = nullptr;
 	BaseAddr      = NULL;
 	Size          = NULL;
 }
 
-Memory::Memory(const wstring& name)
+Memory::Memory(const wstring_view name)
 {
 	ProcessName = name;
 
 	PROCESSENTRY32 PE32;
-	ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32);
-	if (!ListSystemProcesses(const_cast <WCHAR*>(name.c_str()), &PE32))
+	ListSystemProcesses(const_cast <WCHAR*>(name.data()), &PE32);
+	if (!ListSystemProcesses(const_cast <WCHAR*>(name.data()), &PE32))
 	{
 		throw exception("Failed to find process id");
 	}
 	ProcessID     = PE32.th32ProcessID;
 	ProcessHandle = OpenProcess(PROCESS_ALL_ACCESS, false, ProcessID);
+	ProcessHWND   = GetProcessMainWnd(ProcessID);
 	if (!ProcessHandle)
 	{
 		throw exception("Failed to open handle");
 	}
 
 	MODULEENTRY32 ME32;
-	if (!ListProcessModules(ProcessID, name.c_str(), &ME32))
+	if (!ListProcessModules(ProcessID, name.data(), &ME32))
 	{
 		throw exception("Failed to get model info");
 	}

@@ -41,6 +41,8 @@ namespace BF
 	using std::endl;
 	using std::exception;
 	using std::function;
+	using std::ios;
+	using std::ios_base;
 	using std::make_shared;
 	using std::map;
 	using std::ofstream;
@@ -49,24 +51,27 @@ namespace BF
 	using std::stack;
 	using std::static_pointer_cast;
 	using std::string;
+	using std::string_view;
 	using std::to_string;
 	using std::to_wstring;
 	using std::vector;
 	using std::wcout;
 	using std::wstring;
+	using std::wstring_view;
 
 	constexpr auto MAX_MENU_ITEM = 100000;
 	const wstring  OverlayTitle  = L"Blue-Flag\'s External Menu";		// 标题
 
-	constexpr unsigned int joaat(const string& str);
-	constexpr unsigned int joaat(const wstring& str);
+	constexpr UINT joaat(string_view str);
+	constexpr UINT joaat(wstring_view str);
 
 	void AllocCon();
+	void ClearConsole();
 
-	string  to_string(const wstring& ws);
-	wstring to_wstring(const string& s);
+	string  to_string(wstring_view ws);
+	wstring to_wstring(string_view s);
 
-	int StrToVK(const string& str);
+	int StrToVK(string_view str);
 }
 
 using namespace BF;

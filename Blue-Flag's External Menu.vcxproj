@@ -174,14 +174,23 @@
     <ClCompile Include="Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Blue-Flag%27s External Menu.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Blue-Flag%27s External Menu.ico" />
-    <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+    <Image Include="Resource\Blue-Flag%27s External Menu.ico" />
+    <Image Include="Resource\Blue-Flag%27s External Menu.png" />
+    <Image Include="Resource\Blue-Flag-Text-PNG-Large.png" />
+    <Image Include="Resource\Blue-Flag-Text-PNG-Small-org.png" />
+    <Image Include="Resource\Blue-Flag-Text-PNG-Small.png" />
+    <Image Include="Resource\small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resource\Blue-Flag-Text-Plain-Large.txt" />
+    <Text Include="Resource\Blue-Flag-Text-Plain-Small.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Blue-Flag%27s External Menu.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
