@@ -114,7 +114,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
       <AdditionalIncludeDirectories>packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\include;packages\Microsoft.Direct3D.D3D12.1.606.4\build\native\include;packages\directxtk12_desktop_2019.2022.7.30.1\include;tomlplusplus;spdlog\include;spdlog\include\spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -122,6 +122,11 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <EnableModules>false</EnableModules>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,6 +141,7 @@
       <AssemblyDebug>false</AssemblyDebug>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SetChecksum>true</SetChecksum>
     </Link>
     <ResourceCompile>
       <Culture>0x0804</Culture>
@@ -183,6 +189,8 @@
     <Image Include="Resource\Blue-Flag-Text-PNG-Large.png" />
     <Image Include="Resource\Blue-Flag-Text-PNG-Small-org.png" />
     <Image Include="Resource\Blue-Flag-Text-PNG-Small.png" />
+    <Image Include="Resource\Header-Black.png" />
+    <Image Include="Resource\Header.png" />
     <Image Include="Resource\small.ico" />
   </ItemGroup>
   <ItemGroup>

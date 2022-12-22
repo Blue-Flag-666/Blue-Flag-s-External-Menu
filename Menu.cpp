@@ -1,4 +1,4 @@
-#include "pch.hpp"
+Ôªø#include "pch.hpp"
 #include "Menu.hpp"
 
 MenuItem::MenuItem(const string_view str, const int t)
@@ -29,8 +29,8 @@ void Menu::add_toggle(const string_view str, const function <void(Toggle&)>& fun
 	items.emplace_back(make_shared <Toggle>(str, fun));
 }
 
-template <typename T> requires std::integral <T> || std::floating_point <T>
-Range <T>::Range(const string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun): MenuItem(str, getTypeName <Range <T> >())
+template <typename T> requires integral <T> || floating_point <T>
+Range <T>::Range(const string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun): MenuItem(str, getTypeName <Range <T>>())
 {
 	cur   = init;
 	min   = mi;
@@ -39,10 +39,10 @@ Range <T>::Range(const string_view str, T init, T mi, T ma, T d, const function 
 	func  = fun;
 }
 
-template <typename T> requires std::integral <T> || std::floating_point <T>
+template <typename T> requires integral <T> || floating_point <T>
 void Menu::add_range(const string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun)
 {
-	items.emplace_back(make_shared <Range <T> >(str, init, mi, ma, d, fun));
+	items.emplace_back(make_shared <Range <T>>(str, init, mi, ma, d, fun));
 }
 
 shared_ptr <Submenu> Menu::add_submenu(const string_view str, const function <void()>& fun)
@@ -77,25 +77,22 @@ shared_ptr <Menu> Tabs::add_tab(const string name)
 
 void BF::InitMenu(Tabs& tabs, const Settings& settings)
 {
-	const auto t1  = tabs.add_tab("÷˜≤Àµ•");
+	const auto t1  = tabs.add_tab("√ñ√∑¬≤√ã¬µ¬•");
 	const auto tmp = t1->add_submenu("tmp");
-	t1->add_action
-		("add", [tmp]
+	t1->add_action("add", [tmp]
+	{
+		for (auto i = 1; i <= 100; i++)
 		{
-			for (int i = 1; i <= 100; i++)
+			tmp->add_action("1", []
 			{
-				tmp->add_action
-					("1", []
-					{
-						cout << "11" << endl;
-					});
-			}
-		});
-	t1->add_action
-		("clear", [tmp]
-		{
-			tmp->clear();
-		});
+				cout << "11" << endl;
+			});
+		}
+	});
+	t1->add_action("clear", [tmp]
+	{
+		tmp->clear();
+	});
 
-	const auto t2 = tabs.add_tab("…Ë÷√");
+	const auto t2 = tabs.add_tab("√â√®√ñ√É");
 }

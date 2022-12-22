@@ -160,43 +160,51 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
 
 void ParseCmdLine(const LPWSTR lpCmdLine, bool usingDefaultConfig, const bool secondTry)
 {
-	int           cnt       = 0;
-	const LPWSTR* szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
-	for (int i = 0; i < cnt; i++)
+	auto                        cnt       = 0;
+	const LPWSTR*               szArgList = CommandLineToArgvW(lpCmdLine, &cnt);
+	const vector <wstring_view> args(szArgList, szArgList + cnt);
+
+	for (const auto& [arg_str, func] : initializer_list <pair <wstring_view, function <void()>>> {
+			 make_pair
+			 (L"--default-config", []
+			 {
+				 MessageBox(nullptr, L"Using Default Config", OverlayTitle.c_str(), MB_OK);
+				 settings.initDefault();
+			 }),
+			 make_pair
+			 (L"--console-debug", []
+			 {
+				 MessageBox(nullptr, L"Console Debug Mode Enabled", OverlayTitle.c_str(), MB_OK);
+				 AllocCon();
+				 settings.ConsoleDebug = true;
+			 }),
+			 make_pair
+			 (L"--console", []
+			 {
+				 AllocCon();
+			 }),
+			 make_pair
+			 (L"--no-ui", []
+			 {
+				 MessageBox(nullptr, L"UI Disabled", OverlayTitle.c_str(), MB_OK);
+				 settings.NoUI = true;
+			 }),
+			 make_pair
+			 (L"--skip-memory-init", []
+			 {
+				 MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
+				 settings.AlwaysShow  = true;
+				 settings.SkipMemInit = true;
+			 })
+		 })
 	{
-		if (!usingDefaultConfig && !wcscmp(szArgList[i], L"--default-config"))
+		for (auto& arg : args)
 		{
-			MessageBox(nullptr, L"Using Default Config", OverlayTitle.c_str(), MB_OK);
-			AllocCon();
-			usingDefaultConfig = true;
-			break;
+			if (arg_str == arg)
+			{
+				func();
+			}
 		}
-		if (!wcscmp(szArgList[i], L"--console-debug"))
-		{
-			MessageBox(nullptr, L"Console Debug Mode Enabled", OverlayTitle.c_str(), MB_OK);
-			AllocCon();
-			settings.ConsoleDebug = true;
-		}
-		if (!wcscmp(szArgList[i], L"--console"))
-		{
-			AllocCon();
-		}
-		if (!wcscmp(szArgList[i], L"--no-ui"))
-		{
-			MessageBox(nullptr, L"UI Disabled", OverlayTitle.c_str(), MB_OK);
-			settings.NoUI = true;
-		}
-		if (!wcscmp(szArgList[i], L"--skip-memory-init"))
-		{
-			MessageBox(nullptr, L"Memory Init Skipped", OverlayTitle.c_str(), MB_OK);
-			settings.AlwaysShow  = true;
-			settings.SkipMemInit = true;
-		}
-	}
-	if (usingDefaultConfig && !secondTry)
-	{
-		settings.initDefault();
-		ParseCmdLine(lpCmdLine, true, true);
 	}
 }
 
@@ -209,7 +217,7 @@ void ShowConsoleDebugMenu()
 
 	cout << menu->getName() << endl;
 
-	for (int i = 0; i < items.size(); i++)
+	for (auto i = 0; i < items.size(); i++)
 	{
 		cout << (i == menu->cur_item ? "> " : "  ") << items[i]->show();
 	}
@@ -220,9 +228,7 @@ void RefreshMenu()
 	RedrawWindow(OverlayHWND, nullptr, nullptr, RDW_INTERNALPAINT);
 }
 
-void KillMenu()
-{
-}
+void KillMenu() {}
 
 void MenuSelect()
 {
@@ -247,13 +253,13 @@ void MenuSelect()
 		}
 		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int>>(cur_item);
 			x->Excute();
 			break;
 		}
 		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float>>(cur_item);
 			x->Excute();
 			break;
 		}
@@ -294,13 +300,13 @@ void MenuLeft()
 	{
 		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int>>(cur_item);
 			x->left();
 			break;
 		}
 		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float>>(cur_item);
 			x->left();
 			break;
 		}
@@ -315,13 +321,13 @@ void MenuRight()
 	{
 		case Range_int_t:
 		{
-			const auto x = static_pointer_cast <Range <int> >(cur_item);
+			const auto x = static_pointer_cast <Range <int>>(cur_item);
 			x->right();
 			break;
 		}
 		case Range_float_t:
 		{
-			const auto x = static_pointer_cast <Range <float> >(cur_item);
+			const auto x = static_pointer_cast <Range <float>>(cur_item);
 			x->right();
 			break;
 		}
@@ -356,7 +362,7 @@ DWORD KeysThread(LPVOID lpParam)
 		{
 			GTA5.CheckKeys(settings);
 		}
-		Sleep(1);
+		Sleep(3);
 	}
 	settings.KeysThreadKilled = true;
 	return 0;
@@ -365,6 +371,5 @@ DWORD KeysThread(LPVOID lpParam)
 DWORD FuncThread(LPVOID lpParam)
 {
 	// TODO
-
 	return 0;
 }

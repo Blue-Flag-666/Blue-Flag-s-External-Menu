@@ -1,4 +1,4 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "Memory.hpp"
 #include "Blue-Flag's External Menu.hpp"
 
@@ -6,33 +6,30 @@ typedef struct ST_WNDINFO
 {
 	HWND  hWnd;
 	DWORD dwProcessId;
-}         WNDINFO,* LPWNDINFO;
+}         WNDINFO, *LPWNDINFO;
 
 union LPWNDINFO_t
 {
 	LPWNDINFO info;
 	LPARAM    ptr;
 
-	explicit LPWNDINFO_t(const LPARAM p): ptr(p)
-	{
-	}
+	explicit LPWNDINFO_t(const LPARAM p): ptr(p) { }
 };
 
 HWND GetProcessMainWnd(const DWORD dwProcessId)
 {
-	WNDINFO wndInfo { nullptr, dwProcessId };
-	EnumWindows
-		([](const HWND hWnd, const LPARAM lParam) ->BOOL
+	WNDINFO                   wndInfo { nullptr, dwProcessId };
+	EnumWindows([](const HWND hWnd, const LPARAM lParam) ->BOOL
+	{
+		DWORD ProcessId = 0;
+		GetWindowThreadProcessId(hWnd, &ProcessId);
+		if (const auto pInfo = LPWNDINFO_t(lParam).info; ProcessId == pInfo->dwProcessId)
 		{
-			DWORD ProcessId = 0;
-			GetWindowThreadProcessId(hWnd, &ProcessId);
-			if (const auto pInfo = LPWNDINFO_t(lParam).info; ProcessId == pInfo->dwProcessId)
-			{
-				pInfo->hWnd = hWnd;
-				return FALSE;
-			}
-			return TRUE;
-		}, reinterpret_cast <LPARAM>(&wndInfo));
+			pInfo->hWnd = hWnd;
+			return FALSE;
+		}
+		return TRUE;
+	}, reinterpret_cast <LPARAM>(&wndInfo));
 
 	return wndInfo.hWnd;
 }
@@ -103,9 +100,7 @@ bool Trainer::CheckKeyState(const string_view key)
 	return false;
 }
 
-void Trainer::CheckKeys()
-{
-}
+void Trainer::CheckKeys() {}
 
 Trainer::Trainer()
 {

@@ -37,15 +37,21 @@ namespace BF
 {
 	namespace filesystem = std::filesystem;
 	using namespace std::ranges;
+	using std::array;
 	using std::cout;
 	using std::endl;
 	using std::exception;
+	using std::floating_point;
 	using std::function;
+	using std::initializer_list;
+	using std::integral;
 	using std::ios;
 	using std::ios_base;
+	using std::make_pair;
 	using std::make_shared;
 	using std::map;
 	using std::ofstream;
+	using std::pair;
 	using std::set;
 	using std::shared_ptr;
 	using std::stack;

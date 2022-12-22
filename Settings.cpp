@@ -33,35 +33,57 @@ void Settings::initDefault()
 
 void Settings::savetofile() const
 {
-	const auto table = toml::table
-	{
-		{
-			"Menu",
-			toml::table
-			{
-				{ "OverlayWidth", OverlayWidth },
-				{ "OverlayHeight", OverlayHeight },
-				{ "AlwaysShow", AlwaysShow },
-				{ "ConsoleDebug", ConsoleDebug },
-				{ "NoUI", NoUI },
-				{ "UseOldD3D", UseOldD3D },
-			}
-		},
-		{
-			"Keys",
-			toml::table
-			{
-				{ "ToggleMenu", Keys.at("ToggleMenu") },
-				{ "MenuSelect", Keys.at("MenuSelect") },
-				{ "MenuUp", Keys.at("MenuUp") },
-				{ "MenuDown", Keys.at("MenuDown") },
-				{ "MenuLeft", Keys.at("MenuLeft") },
-				{ "MenuRight", Keys.at("MenuRight") },
-				{ "MenuTabLeft", Keys.at("MenuTabLeft") },
-				{ "MenuTabRight", Keys.at("MenuTabRight") },
-				{ "MenuBack", Keys.at("MenuBack") },
-			}
-		}
+	const auto table = toml::table { { "Menu",
+									   toml::table { { "OverlayWidth",
+												       OverlayWidth
+												     },
+												     { "OverlayHeight",
+												       OverlayHeight
+												     },
+												     { "AlwaysShow",
+												       AlwaysShow
+												     },
+												     { "ConsoleDebug",
+												       ConsoleDebug
+												     },
+												     { "NoUI",
+												       NoUI
+												     },
+												     { "UseOldD3D",
+												       UseOldD3D
+												     },
+									   }
+									 },
+									 { "Keys",
+									   toml::table { { "ToggleMenu",
+												       Keys.at("ToggleMenu")
+												     },
+												     { "MenuSelect",
+												       Keys.at("MenuSelect")
+												     },
+												     { "MenuUp",
+												       Keys.at("MenuUp")
+												     },
+												     { "MenuDown",
+												       Keys.at("MenuDown")
+												     },
+												     { "MenuLeft",
+												       Keys.at("MenuLeft")
+												     },
+												     { "MenuRight",
+												       Keys.at("MenuRight")
+												     },
+												     { "MenuTabLeft",
+												       Keys.at("MenuTabLeft")
+												     },
+												     { "MenuTabRight",
+												       Keys.at("MenuTabRight")
+												     },
+												     { "MenuBack",
+												       Keys.at("MenuBack")
+												     },
+									   }
+									 }
 	};
 	ofstream savetofile(Filename);
 	savetofile << table << endl;
@@ -119,19 +141,26 @@ void RendererSettings::initDefault()
 
 void RendererSettings::savetofile() const
 {
-	const auto table = toml::table
-	{
-		{
-			"Menu",
-			toml::table
-			{
-				{ "MenuX", MenuX },
-				{ "MenuY", MenuY },
-				{ "MenuWidth", MenuWidth },
-				{ "MenuHeight", MenuHeight },
-				{ "BorderSize", BorderSize },
-				{ "FontName", FontName },
-			}
+	const auto table = toml::table { { "Menu",
+									   toml::table { { "MenuX",
+												       MenuX
+												     },
+												     { "MenuY",
+												       MenuY
+												     },
+												     { "MenuWidth",
+												       MenuWidth
+												     },
+												     { "MenuHeight",
+												       MenuHeight
+												     },
+												     { "BorderSize",
+												       BorderSize
+												     },
+												     { "FontName",
+												       FontName
+												     },
+									   }
 		}
 	};
 	if (!filesystem::exists("Themes"))

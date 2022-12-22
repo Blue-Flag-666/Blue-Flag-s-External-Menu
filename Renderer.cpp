@@ -8,66 +8,38 @@ Renderer::Renderer(const HWND targetHWND, Settings& s)
 	settings   = shared_ptr <Settings>(&s);
 }
 
-void RendererGDI::init(HWND hWnd)
-{
-}
+void RendererGDI::init(HWND hWnd) {}
 
-void RendererGDI::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const
-{
-}
+void RendererGDI::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const {}
 
-void RendererGDI::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
-{
-}
+void RendererGDI::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const {}
 
-void RendererGDI::drawBox(int x, int y, int w, int h, D3DCOLOR color) const
-{
-}
+void RendererGDI::drawBox(int x, int y, int w, int h, D3DCOLOR color) const {}
 
-void RendererGDI::drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const
-{
-}
+void RendererGDI::drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const {}
 
-void RendererGDI::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const
-{
-}
+void RendererGDI::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const {}
 
-void RendererGDI::render() const
-{
-}
+void RendererGDI::render() const {}
 
 RendererGDI::RendererGDI(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
 	init(overlayHWND);
 }
 
-void RendererD3D12::init(HWND hWnd)
-{
-}
+void RendererD3D12::init(HWND hWnd) {}
 
-void RendererD3D12::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const
-{
-}
+void RendererD3D12::drawText(const wstring_view str, int x, int y, D3DCOLOR color) const {}
 
-void RendererD3D12::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const
-{
-}
+void RendererD3D12::drawText(const wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags) const {}
 
-void RendererD3D12::drawBox(int x, int y, int w, int h, D3DCOLOR color) const
-{
-}
+void RendererD3D12::drawBox(int x, int y, int w, int h, D3DCOLOR color) const {}
 
-void RendererD3D12::drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const
-{
-}
+void RendererD3D12::drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const {}
 
-void RendererD3D12::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const
-{
-}
+void RendererD3D12::drawImage(int x, int y, const wstring_view name, const LPWSTR res = nullptr) const {}
 
-void RendererD3D12::render() const
-{
-}
+void RendererD3D12::render() const {}
 
 RendererD3D12::RendererD3D12(const HWND overlayHWND, const HWND targetHWND, Settings& s): Renderer(targetHWND, s)
 {
@@ -132,7 +104,7 @@ void RendererD3D9::drawBox(const int x, const int y, const int w, const int h, c
 	device->Clear(1, &rect, D3DCLEAR_TARGET, color, 1.f, 0);
 }
 
-void RendererD3D9::drawBoxBorder(const int x, const int y, const int w, const int h, const int borderSize, const D3DCOLOR color, const D3DCOLOR borderColor) const
+void RendererD3D9::drawBoxWithBorder(const int x, const int y, const int w, const int h, const int borderSize, const D3DCOLOR color, const D3DCOLOR borderColor) const
 {
 	drawBox(x, y, w, h, borderColor);
 	drawBox(x + borderSize, y + borderSize, w - borderSize * 2, h - borderSize * 2, color);
@@ -166,10 +138,10 @@ void RendererD3D9::render() const
 
 	if (const auto settings = getSettings(); settings->ActiveMenu && (settings->AlwaysShow || targetHWND() == GetForegroundWindow()))
 	{
-		drawBoxBorder(getRendererSettings().MenuX, getRendererSettings().MenuY, getRendererSettings().MenuWidth, getRendererSettings().MenuHeight, getRendererSettings().BorderSize, D3DCOLOR_ARGB(255, 56, 120, 226),D3DCOLOR_ARGB(255, 1, 1, 1));
+		drawBoxWithBorder(getRendererSettings().MenuX, getRendererSettings().MenuY, getRendererSettings().MenuWidth, getRendererSettings().MenuHeight, getRendererSettings().BorderSize, D3DCOLOR_ARGB(255, 56, 120, 226),D3DCOLOR_ARGB(255, 1, 1, 1));
 		drawText(OverlayTitle, getRendererSettings().MenuX + 10, getRendererSettings().MenuY + 10, 300, 25, D3DCOLOR_ARGB(255, 1, 1, 1),DT_CENTER | DT_VCENTER);
 
-		drawImage(250, 250, L"",MAKEINTRESOURCE(IDB_ICON_PNG));
+		drawImage(250, 250, L"",MAKEINTRESOURCE(IDB_HEADER_BLACK));
 	}
 
 	sprite->End();

@@ -103,6 +103,12 @@
     <Image Include="Resource\Blue-Flag%27s External Menu.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="Resource\Header.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\Header-Black.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resource\Blue-Flag-Text-Plain-Large.txt">

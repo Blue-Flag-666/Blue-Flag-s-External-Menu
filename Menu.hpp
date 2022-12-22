@@ -1,16 +1,17 @@
-#pragma once
+﻿#pragma once
 
 #include "pch.hpp"
 #include "Settings.hpp"
 
 namespace BF
 {
-	enum ItemType { Unknown=0b0, MenuItem_t=0b00001, Action_t=0b11, Toggle_t=0b101, Range_t=0b001001, Range_int_t=0b011001, Range_float_t=0b101001, Menu_t=0b1000001, Submenu_t=0b11000001 };
+	enum ItemType { Unknown = 0b0, MenuItem_t = 0b00001, Action_t = 0b11, Toggle_t = 0b101, Range_t = 0b001001, Range_int_t = 0b011001, Range_float_t = 0b101001, Menu_t = 0b1000001, Submenu_t = 0b11000001 };
 
 	class MenuItem
 	{
 		string name;
 		int    type = MenuItem_t;
+
 		public:
 			[[nodiscard]] string_view getName() const
 			{
@@ -35,6 +36,7 @@ namespace BF
 	class Action final : public MenuItem
 	{
 		function <void()> func;
+
 		public:
 			void Excute() const
 			{
@@ -54,6 +56,7 @@ namespace BF
 	{
 		function <void(Toggle&)> func;
 		bool                     on = false;
+
 		public:
 			[[nodiscard]] const bool& IsOn() const
 			{
@@ -79,11 +82,12 @@ namespace BF
 			Toggle(string_view str, const function <void(Toggle&)>& fun);
 	};
 
-	template <typename T> requires std::integral <T> || std::floating_point <T>
+	template <typename T> requires integral <T> || floating_point <T>
 	class Range final : public MenuItem
 	{
 		function <void(T&)> func;
 		T                   cur, min, max, delta;
+
 		public:
 			void left()
 			{
@@ -125,11 +129,12 @@ namespace BF
 
 	class Menu : public MenuItem
 	{
-		vector <shared_ptr <MenuItem> > items {};
+		vector <shared_ptr <MenuItem>> items {};
+
 		public:
 			int cur_item = 0;
 
-			[[nodiscard]] const vector <shared_ptr <MenuItem> >& getItems()
+			[[nodiscard]] const vector <shared_ptr <MenuItem>>& getItems()
 			{
 				return items;
 			}
@@ -146,7 +151,7 @@ namespace BF
 
 			void add_action(string_view str, const function <void()>& fun);
 			void add_toggle(string_view str, const function <void(Toggle&)>& fun);
-			template <typename T> requires std::integral <T> || std::floating_point <T>
+			template <typename T> requires integral <T> || floating_point <T>
 			void                 add_range(string_view str, T init, T mi, T ma, T d, const function <void(T&)>& fun);
 			shared_ptr <Submenu> add_submenu(string_view str, const function <void()>& fun = nullptr);
 
@@ -157,6 +162,7 @@ namespace BF
 	class Submenu final : public Menu
 	{
 		function <void()> func;
+
 		public:
 			Submenu() = default;
 			explicit Submenu(string_view str, const function <void()>& fun);
@@ -164,7 +170,7 @@ namespace BF
 
 	struct MenuTab
 	{
-		stack <shared_ptr <Menu> > menu_stack {};
+		stack <shared_ptr <Menu>> menu_stack {};
 
 		MenuTab() = default;
 		explicit MenuTab(shared_ptr <Menu> m);
@@ -172,7 +178,7 @@ namespace BF
 
 	struct Tabs
 	{
-		vector <shared_ptr <MenuTab> > tabs;
+		vector <shared_ptr <MenuTab>> tabs;
 
 		Tabs() = default;
 
@@ -201,12 +207,12 @@ namespace BF
 		return Toggle_t;
 	}
 
-	template <> inline ItemType getTypeName <Range <int> >()
+	template <> inline ItemType getTypeName <Range <int>>()
 	{
 		return Range_int_t;
 	}
 
-	template <> inline ItemType getTypeName <Range <float> >()
+	template <> inline ItemType getTypeName <Range <float>>()
 	{
 		return Range_float_t;
 	}

@@ -17,12 +17,12 @@ namespace BF
 		virtual void drawText(wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags = 0) const = 0;
 
 		virtual void drawBox(int x, int y, int w, int h, D3DCOLOR color) const = 0;
-		virtual void drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const = 0;
+		virtual void drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const = 0;
 
-		virtual void drawImage(int x, int y, wstring_view name,LPWSTR res) const = 0;
+		virtual void drawImage(int x, int y, wstring_view name, LPWSTR res) const = 0;
 
 		public:
-			[[nodiscard]] const HWND targetHWND() const
+			[[nodiscard]] HWND targetHWND() const
 			{
 				return TargetHWND;
 			}
@@ -59,9 +59,9 @@ namespace BF
 		virtual void drawText(wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags = 0) const override;
 
 		virtual void drawBox(int x, int y, int w, int h, D3DCOLOR color) const override;
-		virtual void drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
+		virtual void drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
 
-		virtual void drawImage(int x, int y, wstring_view name,LPWSTR res) const override;
+		virtual void drawImage(int x, int y, wstring_view name, LPWSTR res) const override;
 
 		public:
 			virtual void render() const override;
@@ -81,9 +81,9 @@ namespace BF
 		virtual void drawText(wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags = 0) const override;
 
 		virtual void drawBox(int x, int y, int w, int h, D3DCOLOR color) const override;
-		virtual void drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
+		virtual void drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
 
-		virtual void drawImage(int x, int y, wstring_view name,LPWSTR res) const override;
+		virtual void drawImage(int x, int y, wstring_view name, LPWSTR res) const override;
 
 		public:
 			virtual void render() const override;
@@ -106,9 +106,9 @@ namespace BF
 		virtual void drawText(wstring_view str, int x, int y, int w, int h, D3DCOLOR color, DWORD flags = 0) const override;
 
 		virtual void drawBox(int x, int y, int w, int h, D3DCOLOR color) const override;
-		virtual void drawBoxBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
+		virtual void drawBoxWithBorder(int x, int y, int w, int h, int borderSize, D3DCOLOR color, D3DCOLOR borderColor) const override;
 
-		virtual void drawImage(int x, int y, wstring_view name,LPWSTR res) const override;
+		virtual void drawImage(int x, int y, wstring_view name, LPWSTR res) const override;
 
 		public:
 			virtual void render() const override;

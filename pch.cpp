@@ -8,7 +8,7 @@ namespace BF
 {
 	constexpr UINT joaat(const string_view str)
 	{
-		constexpr UINT MASK = 0xffffffff;
+		constexpr auto MASK = 0xffffffff;
 		unsigned int   hash = 0;
 		for_each(str, tolower);
 		for (const auto i : str)
@@ -25,7 +25,7 @@ namespace BF
 
 	constexpr UINT joaat(const wstring_view str)
 	{
-		constexpr UINT MASK = 0xffffffff;
+		constexpr auto MASK = 0xffffffff;
 		unsigned int   hash = 0;
 		for_each(str, tolower);
 		for (const auto i : str)
@@ -84,372 +84,372 @@ namespace BF
 	int StrToVK(const string_view str)
 	{
 		for_each(str, toupper);
-		
+
 		if (str == "BACKSPACE")
 		{
 			return 0x08;
 		}
-		else if (str == "TAB")
+		if (str == "TAB")
 		{
 			return 0x09;
 		}
-		else if (str == "CLEAR")
+		if (str == "CLEAR")
 		{
 			return 0x0C;
 		}
-		else if (str == "ENTER" || str == "RETURN")
+		if (str == "ENTER" || str == "RETURN")
 		{
 			return 0x0D;
 		}
-		else if (str == "SHIFT")
+		if (str == "SHIFT")
 		{
 			return 0x10;
 		}
-		else if (str == "CTRL" || str == "CONTROL")
+		if (str == "CTRL" || str == "CONTROL")
 		{
 			return 0x11;
 		}
-		else if (str == "ALT")
+		if (str == "ALT")
 		{
 			return 0x12;
 		}
-		else if (str == "PAUSE")
+		if (str == "PAUSE")
 		{
 			return 0x13;
 		}
-		else if (str == "CAPS" || str == "CAPSLOCK" || str == "CAPS LOCK" || str == "CAPITAL")
+		if (str == "CAPS" || str == "CAPSLOCK" || str == "CAPS LOCK" || str == "CAPITAL")
 		{
 			return 0x14;
 		}
-		else if (str == "ESC" || str == "ESCAPE")
+		if (str == "ESC" || str == "ESCAPE")
 		{
 			return 0x1B;
 		}
-		else if (str == "SPACE")
+		if (str == "SPACE")
 		{
 			return 0x20;
 		}
-		else if (str == "PGUP" || str == "PAGEUP")
+		if (str == "PGUP" || str == "PAGEUP")
 		{
 			return 0x21;
 		}
-		else if (str == "PGDN" || str == "PAGEDOWN")
+		if (str == "PGDN" || str == "PAGEDOWN")
 		{
 			return 0x22;
 		}
-		else if (str == "END")
+		if (str == "END")
 		{
 			return 0x23;
 		}
-		else if (str == "HOME")
+		if (str == "HOME")
 		{
 			return 0x24;
 		}
-		else if (str == "LEFT")
+		if (str == "LEFT")
 		{
 			return 0x25;
 		}
-		else if (str == "UP")
+		if (str == "UP")
 		{
 			return 0x26;
 		}
-		else if (str == "RIGHT")
+		if (str == "RIGHT")
 		{
 			return 0x27;
 		}
-		else if (str == "DOWN")
+		if (str == "DOWN")
 		{
 			return 0x28;
 		}
-		else if (str == "INSERT")
+		if (str == "INSERT")
 		{
 			return 0x2D;
 		}
-		else if (str == "DEL" || str == "DELETE")
+		if (str == "DEL" || str == "DELETE")
 		{
 			return 0x2E;
 		}
-		else if (str == "0")
+		if (str == "0")
 		{
 			return 0x30;
 		}
-		else if (str == "1")
+		if (str == "1")
 		{
 			return 0x31;
 		}
-		else if (str == "2")
+		if (str == "2")
 		{
 			return 0x32;
 		}
-		else if (str == "3")
+		if (str == "3")
 		{
 			return 0x33;
 		}
-		else if (str == "4")
+		if (str == "4")
 		{
 			return 0x34;
 		}
-		else if (str == "5")
+		if (str == "5")
 		{
 			return 0x35;
 		}
-		else if (str == "6")
+		if (str == "6")
 		{
 			return 0x36;
 		}
-		else if (str == "7")
+		if (str == "7")
 		{
 			return 0x37;
 		}
-		else if (str == "8")
+		if (str == "8")
 		{
 			return 0x38;
 		}
-		else if (str == "9")
+		if (str == "9")
 		{
 			return 0x39;
 		}
-		else if (str == "A")
+		if (str == "A")
 		{
 			return 0x41;
 		}
-		else if (str == "B")
+		if (str == "B")
 		{
 			return 0x42;
 		}
-		else if (str == "C")
+		if (str == "C")
 		{
 			return 0x43;
 		}
-		else if (str == "D")
+		if (str == "D")
 		{
 			return 0x44;
 		}
-		else if (str == "E")
+		if (str == "E")
 		{
 			return 0x45;
 		}
-		else if (str == "F")
+		if (str == "F")
 		{
 			return 0x46;
 		}
-		else if (str == "G")
+		if (str == "G")
 		{
 			return 0x47;
 		}
-		else if (str == "H")
+		if (str == "H")
 		{
 			return 0x48;
 		}
-		else if (str == "I")
+		if (str == "I")
 		{
 			return 0x49;
 		}
-		else if (str == "J")
+		if (str == "J")
 		{
 			return 0x4A;
 		}
-		else if (str == "K")
+		if (str == "K")
 		{
 			return 0x4B;
 		}
-		else if (str == "L")
+		if (str == "L")
 		{
 			return 0x4C;
 		}
-		else if (str == "M")
+		if (str == "M")
 		{
 			return 0x4D;
 		}
-		else if (str == "N")
+		if (str == "N")
 		{
 			return 0x4E;
 		}
-		else if (str == "O")
+		if (str == "O")
 		{
 			return 0x4F;
 		}
-		else if (str == "P")
+		if (str == "P")
 		{
 			return 0x50;
 		}
-		else if (str == "Q")
+		if (str == "Q")
 		{
 			return 0x51;
 		}
-		else if (str == "R")
+		if (str == "R")
 		{
 			return 0x52;
 		}
-		else if (str == "S")
+		if (str == "S")
 		{
 			return 0x53;
 		}
-		else if (str == "T")
+		if (str == "T")
 		{
 			return 0x54;
 		}
-		else if (str == "U")
+		if (str == "U")
 		{
 			return 0x55;
 		}
-		else if (str == "V")
+		if (str == "V")
 		{
 			return 0x56;
 		}
-		else if (str == "W")
+		if (str == "W")
 		{
 			return 0x57;
 		}
-		else if (str == "X")
+		if (str == "X")
 		{
 			return 0x58;
 		}
-		else if (str == "Y")
+		if (str == "Y")
 		{
 			return 0x59;
 		}
-		else if (str == "Z")
+		if (str == "Z")
 		{
 			return 0x5A;
 		}
-		else if (str == "NUM0")
+		if (str == "NUM0")
 		{
 			return 0x60;
 		}
-		else if (str == "NUM1")
+		if (str == "NUM1")
 		{
 			return 0x61;
 		}
-		else if (str == "NUM2")
+		if (str == "NUM2")
 		{
 			return 0x62;
 		}
-		else if (str == "NUM3")
+		if (str == "NUM3")
 		{
 			return 0x63;
 		}
-		else if (str == "NUM4")
+		if (str == "NUM4")
 		{
 			return 0x64;
 		}
-		else if (str == "NUM5")
+		if (str == "NUM5")
 		{
 			return 0x65;
 		}
-		else if (str == "NUM6")
+		if (str == "NUM6")
 		{
 			return 0x66;
 		}
-		else if (str == "NUM7")
+		if (str == "NUM7")
 		{
 			return 0x67;
 		}
-		else if (str == "NUM8")
+		if (str == "NUM8")
 		{
 			return 0x68;
 		}
-		else if (str == "NUM9")
+		if (str == "NUM9")
 		{
 			return 0x69;
 		}
-		else if (str == "NUM*")
+		if (str == "NUM*")
 		{
 			return 0x6A;
 		}
-		else if (str == "NUM+")
+		if (str == "NUM+")
 		{
 			return 0x6B;
 		}
-		else if (str == "NUM-")
+		if (str == "NUM-")
 		{
 			return 0x6D;
 		}
-		else if (str == "NUM." || str == "NUMDEL")
+		if (str == "NUM." || str == "NUMDEL")
 		{
 			return 0x6E;
 		}
-		else if (str == "NUM/")
+		if (str == "NUM/")
 		{
 			return 0x6F;
 		}
-		else if (str == "F1")
+		if (str == "F1")
 		{
 			return 0x70;
 		}
-		else if (str == "F2")
+		if (str == "F2")
 		{
 			return 0x71;
 		}
-		else if (str == "F3")
+		if (str == "F3")
 		{
 			return 0x72;
 		}
-		else if (str == "F4")
+		if (str == "F4")
 		{
 			return 0x73;
 		}
-		else if (str == "F5")
+		if (str == "F5")
 		{
 			return 0x74;
 		}
-		else if (str == "F6")
+		if (str == "F6")
 		{
 			return 0x75;
 		}
-		else if (str == "F7")
+		if (str == "F7")
 		{
 			return 0x76;
 		}
-		else if (str == "F8")
+		if (str == "F8")
 		{
 			return 0x77;
 		}
-		else if (str == "F9")
+		if (str == "F9")
 		{
 			return 0x78;
 		}
-		else if (str == "F10")
+		if (str == "F10")
 		{
 			return 0x79;
 		}
-		else if (str == "F11")
+		if (str == "F11")
 		{
 			return 0x7A;
 		}
-		else if (str == "F12")
+		if (str == "F12")
 		{
 			return 0x7B;
 		}
-		else if (str == "NUMLOCK")
+		if (str == "NUMLOCK")
 		{
 			return 0x90;
 		}
-		else if (str == "SCROLL" || str == "SCROLLLOCK")
+		if (str == "SCROLL" || str == "SCROLLLOCK")
 		{
 			return 0x91;
 		}
-		else if (str == "LSHIFT")
+		if (str == "LSHIFT")
 		{
 			return 0xA0;
 		}
-		else if (str == "RSHIFT")
+		if (str == "RSHIFT")
 		{
 			return 0xA1;
 		}
-		else if (str == "LCTRL" || str == "LCONTROL")
+		if (str == "LCTRL" || str == "LCONTROL")
 		{
 			return 0xA2;
 		}
-		else if (str == "RCTRL" || str == "RCONTROL")
+		if (str == "RCTRL" || str == "RCONTROL")
 		{
 			return 0xA3;
 		}
-		else if (str == "LALT")
+		if (str == "LALT")
 		{
 			return 0xA4;
 		}
-		else if (str == "RALT")
+		if (str == "RALT")
 		{
 			return 0xA5;
 		}
